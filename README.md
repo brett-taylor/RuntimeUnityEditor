@@ -1,4 +1,9 @@
-# Runtime Unity Editor / Debugging Tools
+# Runtime Unity Editor For Subnautica + QMods
+
+### Subnautica + QMods Fork
+This fork is to work with Subnautica and in particular the QMods framework. This will be maintained to stay working with the latest Subnautica / QMods updates. It will not be updated to be in parity with ManlyMarco/RuntimeUnityEditor.
+
+### Description
 In-game inspector, editor and interactive console for applications made with Unity3D game engine. It's designed for debugging and modding Unity games, but can also be used as an universal trainer.
 
 ### Features
