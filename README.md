@@ -25,4 +25,4 @@ In-game inspector, editor and interactive console for Subnautica. It's designed 
 ---
 ##### Supporting Development
 I really didn't do much, if you love this tool so much the original author had this message:
-You can support development of my plugins through my Patreon page: https://www.patreon.com/ManlyMarco
+`You can support development of my plugins through my Patreon page: https://www.patreon.com/ManlyMarco`
