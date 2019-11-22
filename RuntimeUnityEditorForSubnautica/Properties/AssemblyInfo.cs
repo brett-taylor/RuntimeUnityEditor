@@ -1,15 +1,15 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using RuntimeUnityEditor.Core;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RuntimeUnityEditor.Bepin4")]
+[assembly: AssemblyTitle("RuntimeUnityEditorForSubnautica")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("RuntimeUnityEditor.Bepin4")]
+[assembly: AssemblyProduct("RuntimeUnityEditorForSubnautica")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using RuntimeUnityEditor.Core;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("452f4984-2dd8-4fb6-8d43-a87b7a27323c")]
+[assembly: Guid("d47771b5-646f-4a43-853a-7fc16a2576e5")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -33,4 +33,4 @@ using RuntimeUnityEditor.Core;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion(RuntimeUnityEditorCore.Version)]
+[assembly: AssemblyFileVersion("1.0.0.0")]

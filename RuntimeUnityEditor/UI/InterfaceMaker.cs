@@ -30,7 +30,7 @@ namespace RuntimeUnityEditor.Core.UI
                     }
                     catch (Exception ex)
                     {
-                        RuntimeUnityEditorCore.Logger.Log(LogLevel.Warning, "Could not load custom GUISkin - " + ex.Message);
+                        RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Warning, "Could not load custom GUISkin - " + ex.Message);
                         _customSkin = GUI.skin;
                     }
                 }

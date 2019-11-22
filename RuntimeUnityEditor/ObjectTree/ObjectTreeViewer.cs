@@ -187,7 +187,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
                 }
                 GUILayout.EndHorizontal();
 
-                if (needsHeightMeasure && Event.current.type == EventType.repaint)
+                if (needsHeightMeasure && Event.current.type == EventType.Repaint)
                     _singleObjectTreeItemHeight = Mathf.CeilToInt(GUILayoutUtility.GetLastRect().height);
             }
             else
@@ -204,7 +204,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
         public void DisplayViewer()
         {
-            if (_wireframe && _actuallyInsideOnGui && Event.current.type == EventType.layout)
+            if (_wireframe && _actuallyInsideOnGui && Event.current.type == EventType.Layout)
                 GL.wireframe = false;
 
             if (Enabled)
@@ -549,7 +549,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
                 {
                     if (string.IsNullOrEmpty(_searchText))
                     {
-                        RuntimeUnityEditorCore.Logger.Log(LogLevel.Message | LogLevel.Warning, "Can't search for empty string");
+                        RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Message | LogLevel.Warning, "Can't search for empty string");
                     }
                     else
                     {
@@ -560,11 +560,11 @@ namespace RuntimeUnityEditor.Core.ObjectTree
                         var stackEntries = matchedTypes.Select(t => new StaticStackEntry(t, t.FullName)).ToList();
 
                         if (stackEntries.Count == 0)
-                            RuntimeUnityEditorCore.Logger.Log(LogLevel.Message | LogLevel.Warning, "No static type names contained the search string");
+                            RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Message | LogLevel.Warning, "No static type names contained the search string");
                         else if (stackEntries.Count == 1)
-                            RuntimeUnityEditorCore.Instance.Inspector.InspectorPush(stackEntries.Single());
+                            RuntimeUnityEditorCore.INSTANCE.Inspector.InspectorPush(stackEntries.Single());
                         else
-                            RuntimeUnityEditorCore.Instance.Inspector.InspectorPush(new InstanceStackEntry(stackEntries, "Static type search"));
+                            RuntimeUnityEditorCore.INSTANCE.Inspector.InspectorPush(new InstanceStackEntry(stackEntries, "Static type search"));
                     }
                 }
             }

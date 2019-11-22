@@ -140,7 +140,7 @@ namespace RuntimeUnityEditor.Core.Inspector
             }
             catch (Exception ex)
             {
-                RuntimeUnityEditorCore.Logger.Log(LogLevel.Warning, "[Inspector] CacheFields crash: " + ex);
+                RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Warning, "[Inspector] CacheFields crash: " + ex);
             }
         }
 
@@ -156,7 +156,7 @@ namespace RuntimeUnityEditor.Core.Inspector
             }
             catch (Exception ex)
             {
-                RuntimeUnityEditorCore.Logger.Log(LogLevel.Warning, "[Inspector] CacheFields crash: " + ex);
+                RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Warning, "[Inspector] CacheFields crash: " + ex);
             }
         }
 
@@ -214,7 +214,7 @@ namespace RuntimeUnityEditor.Core.Inspector
                     }
                     catch (Exception ex)
                     {
-                        RuntimeUnityEditorCore.Logger.Log(LogLevel.Error, "[Inspector] Failed to set value - " + ex.Message);
+                        RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Error, "[Inspector] Failed to set value - " + ex.Message);
                     }
                 }
                 else
@@ -392,7 +392,7 @@ namespace RuntimeUnityEditor.Core.Inspector
             }
             catch (Exception ex)
             {
-                RuntimeUnityEditorCore.Logger.Log(LogLevel.Error, "[Inspector] GUI crash: " + ex);
+                RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Error, "[Inspector] GUI crash: " + ex);
                 InspectorClear();
             }
 
@@ -486,7 +486,7 @@ namespace RuntimeUnityEditor.Core.Inspector
             while (_inspectorStack.Count > 0 && !_inspectorStack.Peek().EntryIsValid())
             {
                 var se = _inspectorStack.Pop();
-                RuntimeUnityEditorCore.Logger.Log(LogLevel.Message, $"[Inspector] Removed invalid/removed stack object: \"{se.Name}\"");
+                RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Message, $"[Inspector] Removed invalid/removed stack object: \"{se.Name}\"");
             }
 
             if (_inspectorStack.Count != 0)

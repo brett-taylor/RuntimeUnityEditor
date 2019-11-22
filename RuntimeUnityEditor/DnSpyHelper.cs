@@ -25,7 +25,7 @@ namespace RuntimeUnityEditor.Core
                     if (File.Exists(_dnSpyPath) && _dnSpyPath.EndsWith("dnspy.exe", StringComparison.OrdinalIgnoreCase))
                         IsAvailable = true;
                     else
-                        RuntimeUnityEditorCore.Logger.Log(LogLevel.Error | LogLevel.Message, "[DnSpyHelper] Invalid dnSpy path. The path has to point to 64bit dnSpy.exe");
+                        RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Error | LogLevel.Message, "[DnSpyHelper] Invalid dnSpy path. The path has to point to 64bit dnSpy.exe");
                 }
             }
         }
@@ -37,7 +37,7 @@ namespace RuntimeUnityEditor.Core
             try { OpenInDnSpy(entry.GetMemberInfo(true)); }
             catch (Exception e)
             {
-                RuntimeUnityEditorCore.Logger.Log(LogLevel.Error | LogLevel.Message, "[DnSpyHelper] " + e.Message);
+                RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Error | LogLevel.Message, "[DnSpyHelper] " + e.Message);
             }
         }
 
@@ -55,7 +55,7 @@ namespace RuntimeUnityEditor.Core
             }
             catch (Exception e)
             {
-                RuntimeUnityEditorCore.Logger.Log(LogLevel.Error | LogLevel.Message, "[DnSpyHelper] " + e.Message);
+                RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Error | LogLevel.Message, "[DnSpyHelper] " + e.Message);
             }
         }
 
@@ -91,13 +91,13 @@ namespace RuntimeUnityEditor.Core
             }
             catch (Exception e)
             {
-                RuntimeUnityEditorCore.Logger.Log(LogLevel.Error | LogLevel.Message, "[DnSpyHelper] " + e.Message);
+                RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Error | LogLevel.Message, "[DnSpyHelper] " + e.Message);
             }
         }
 
         private static void StartDnSpy(string refString)
         {
-            RuntimeUnityEditorCore.Logger.Log(LogLevel.Info, $"[DnSpyHelper] Opening {DnSpyPath} {refString}");
+            RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Info, $"[DnSpyHelper] Opening {DnSpyPath} {refString}");
             Process.Start(DnSpyPath, refString);
         }
     }

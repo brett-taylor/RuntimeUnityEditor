@@ -12,7 +12,7 @@ namespace RuntimeUnityEditor.Core.Utils
         public static void DumpObjects(params GameObject[] objects)
         {
             var fname = Path.GetTempFileName() + ".txt";
-            RuntimeUnityEditorCore.Logger.Log(LogLevel.Info, $"Dumping {objects.Length} GameObjects to {fname}");
+            RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Info, $"Dumping {objects.Length} GameObjects to {fname}");
             using (var f = File.OpenWrite(fname))
             using (var sw = new StreamWriter(f, Encoding.UTF8))
             {
@@ -20,7 +20,7 @@ namespace RuntimeUnityEditor.Core.Utils
                     PrintRecursive(sw, obj);
             }
             var pi = new ProcessStartInfo(fname) { UseShellExecute = true };
-            RuntimeUnityEditorCore.Logger.Log(LogLevel.Info, $"Opening {fname}");
+            RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Info, $"Opening {fname}");
             Process.Start(pi);
         }
 
@@ -48,7 +48,7 @@ namespace RuntimeUnityEditor.Core.Utils
                     }
                     catch (Exception e)
                     {
-                        RuntimeUnityEditorCore.Logger.Log(LogLevel.Debug, e);
+                        RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Debug, e);
                     }
                 }
             }

@@ -46,7 +46,7 @@ namespace RuntimeUnityEditor.Core.REPL
                             .SelectMany(Extensions.GetTypesSafe)
                             .Where(x => x.IsPublic && !string.IsNullOrEmpty(x.Namespace))
                             .Select(x => x.Namespace));
-                    RuntimeUnityEditorCore.Logger.Log(LogLevel.Debug, $"[REPL] Found {_namespaces.Count} public namespaces");
+                    RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Debug, $"[REPL] Found {_namespaces.Count} public namespaces");
                 }
                 return _namespaces;
             }
@@ -85,7 +85,7 @@ namespace RuntimeUnityEditor.Core.REPL
                 if (allLines.Length > 0)
                 {
                     var message = "Executing code from " + _autostartFilename;
-                    RuntimeUnityEditorCore.Logger.Log(LogLevel.Info, message);
+                    RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Info, message);
                     _sb.AppendLine(message);
                     foreach (var line in allLines)
                         Evaluate(line);
@@ -259,7 +259,7 @@ namespace RuntimeUnityEditor.Core.REPL
             }
             catch (Exception ex)
             {
-                RuntimeUnityEditorCore.Logger.Log(LogLevel.Debug, "[REPL] " + ex);
+                RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Debug, "[REPL] " + ex);
                 ClearSuggestions();
             }
         }

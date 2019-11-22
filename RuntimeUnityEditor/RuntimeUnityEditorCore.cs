@@ -9,49 +9,38 @@ using UnityEngine;
 
 namespace RuntimeUnityEditor.Core
 {
-    public class RuntimeUnityEditorCore
+    public class RuntimeUnityEditorCore : MonoBehaviour
     {
-        public const string Version = "1.10";
-        public const string GUID = "RuntimeUnityEditor";
+        public static RuntimeUnityEditorCore INSTANCE { get; }
+        internal static KeyCode SHOW_HOT_KEY { get; set; } = KeyCode.F7;
+        internal static ILoggerWrapper LOGGER { get; private set; }
 
-        public Inspector.Inspector Inspector { get; }
-        public ObjectTreeViewer TreeViewer { get; }
-        public ReplWindow Repl { get; }
+        public Inspector.Inspector Inspector { get; private set; }
+        public ObjectTreeViewer TreeViewer { get; private set; }
+        public ReplWindow Repl { get; private set; }
 
-        public KeyCode ShowHotkey { get; set; } = KeyCode.F12;
-
-        internal static RuntimeUnityEditorCore Instance { get; private set; }
-        internal static MonoBehaviour PluginObject { get; private set; }
-        internal static ILoggerWrapper Logger { get; private set; }
-
-        private readonly GizmoDrawer _gizmoDrawer;
-        private readonly GameObjectSearcher _gameObjectSearcher = new GameObjectSearcher();
-
+        private GizmoDrawer _gizmoDrawer;
+        private GameObjectSearcher _gameObjectSearcher = new GameObjectSearcher();
         private CursorLockMode _previousCursorLockState;
         private bool _previousCursorVisible;
 
-        internal RuntimeUnityEditorCore(MonoBehaviour pluginObject, ILoggerWrapper logger, string configPath)
+        public void Setup(ILoggerWrapper logger, string configPath)
         {
-            if (Instance != null)
-                throw new InvalidOperationException("Can only create one instance of the Core object");
-
-            PluginObject = pluginObject;
-            Logger = logger;
-            Instance = this;
-
+            LOGGER = logger;
             Inspector = new Inspector.Inspector(targetTransform => TreeViewer.SelectAndShowObject(targetTransform));
-
-            TreeViewer = new ObjectTreeViewer(pluginObject, _gameObjectSearcher);
-            TreeViewer.InspectorOpenCallback = items =>
+            TreeViewer = new ObjectTreeViewer(this, _gameObjectSearcher)
             {
-                Inspector.InspectorClear();
-                foreach (var stackEntry in items)
-                    Inspector.InspectorPush(stackEntry);
+                InspectorOpenCallback = items =>
+                {
+                    Inspector.InspectorClear();
+                    foreach (var stackEntry in items)
+                        Inspector.InspectorPush(stackEntry);
+                }
             };
 
             if (UnityFeatureHelper.SupportsVectrosity)
             {
-                _gizmoDrawer = new GizmoDrawer(pluginObject);
+                _gizmoDrawer = new GizmoDrawer(this);
                 TreeViewer.TreeSelectionChangedCallback = transform => _gizmoDrawer.UpdateState(transform);
             }
 
@@ -65,7 +54,7 @@ namespace RuntimeUnityEditor.Core
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(LogLevel.Warning, "Failed to load REPL - " + ex.Message);
+                    LOGGER.Log(LogLevel.Warning, "Failed to load REPL - " + ex.Message);
                 }
             }
         }
@@ -130,7 +119,7 @@ namespace RuntimeUnityEditor.Core
 
         internal void Update()
         {
-            if (Input.GetKeyDown(ShowHotkey))
+            if (Input.GetKeyDown(SHOW_HOT_KEY))
                 Show = !Show;
 
             if (Show)

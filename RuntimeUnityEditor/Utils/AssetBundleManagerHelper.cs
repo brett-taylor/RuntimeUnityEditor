@@ -35,11 +35,11 @@ namespace RuntimeUnityEditor.Core.Utils
                 try
                 {
                     var unloadedCount = ClearAssetBundleCache();
-                    RuntimeUnityEditorCore.Logger.Log(LogLevel.Message, "Unloaded " + unloadedCount + " AssetBundles");
+                    RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Message, "Unloaded " + unloadedCount + " AssetBundles");
                 }
                 catch (Exception e)
                 {
-                    RuntimeUnityEditorCore.Logger.Log(LogLevel.Message | LogLevel.Error, "Failed to clear the AssetBundle cache - " + e);
+                    RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Message | LogLevel.Error, "Failed to clear the AssetBundle cache - " + e);
                 }
             }
         }

@@ -17,7 +17,7 @@ namespace RuntimeUnityEditor.Core.REPL
         static REPL()
         {
             var go = new GameObject("UnityREPL");
-            go.transform.parent = RuntimeUnityEditorCore.PluginObject.transform;
+            go.transform.parent = RuntimeUnityEditorCore.INSTANCE.transform;
             MB = go.AddComponent<ReplHelper>();
         }
 
@@ -142,7 +142,7 @@ namespace RuntimeUnityEditor.Core.REPL
         [Documentation("geti() - get object currently opened in inspector. Will get expanded upon accepting. Best to use like this: var x = geti()")]
         public static object geti()
         {
-            return RuntimeUnityEditorCore.Instance.Inspector.GetInspectedObject()
+            return RuntimeUnityEditorCore.INSTANCE.Inspector.GetInspectedObject()
                 ?? throw new InvalidOperationException("No object is opened in inspector or a static type is opened");
         }
 
@@ -156,14 +156,14 @@ namespace RuntimeUnityEditor.Core.REPL
         public static void seti(object obj)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
-            RuntimeUnityEditorCore.Instance.Inspector.InspectorPush(new InstanceStackEntry(obj, "REPL > " + obj.GetType().Name));
+            RuntimeUnityEditorCore.INSTANCE.Inspector.InspectorPush(new InstanceStackEntry(obj, "REPL > " + obj.GetType().Name));
         }
 
         [Documentation("setis(type) - send the static class to the inspector.")]
         public static void setis(Type type)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            RuntimeUnityEditorCore.Instance.Inspector.InspectorPush(new StaticStackEntry(type, "REPL > " + type.Name));
+            RuntimeUnityEditorCore.INSTANCE.Inspector.InspectorPush(new StaticStackEntry(type, "REPL > " + type.Name));
         }
         
         [Documentation("dnspy(type) - open the type in dnSpy if dnSpy path is configured.")]
@@ -183,13 +183,13 @@ namespace RuntimeUnityEditor.Core.REPL
         [Documentation("echo(string) - write a string to REPL output.")]
         public static void echo(string message)
         {
-            RuntimeUnityEditorCore.Instance.Repl.AppendLogLine(message);
+            RuntimeUnityEditorCore.INSTANCE.Repl.AppendLogLine(message);
         }
 
         [Documentation("message(string) - write a string to log.")]
         public static void message(string message)
         {
-            RuntimeUnityEditorCore.Logger.Log(LogLevel.Message, message);
+            RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Message, message);
         }
 
         [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
