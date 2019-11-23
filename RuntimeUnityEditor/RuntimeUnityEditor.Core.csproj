@@ -37,6 +37,9 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Subnautica\Subnautica_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
     <Reference Include="mcs">
       <HintPath>..\..\mcs-master\mcs\bin\x64\Debug\mcs.dll</HintPath>
     </Reference>

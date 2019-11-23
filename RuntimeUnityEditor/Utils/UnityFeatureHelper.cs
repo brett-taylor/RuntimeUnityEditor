@@ -30,16 +30,12 @@ namespace RuntimeUnityEditor.Core.Utils
             SupportsXml = _xml != null;
             if (!SupportsXml)
                 RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Warning, "System.XML.dll is not available, REPL will be disabled");
-
-            SupportsVectrosity = _vectrosity != null;
-            if (!SupportsVectrosity)
-                RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Warning, "Vectrosity.dll is not available, drawing gizmos will be disabled");
         }
 
         public static bool SupportsScenes { get; private set; }
         public static bool SupportsXml { get; }
         public static bool SupportsCursorIndex { get; }
-        public static bool SupportsVectrosity { get; }
+        public static bool SupportsVectrosity => true;
 
         public static IEnumerable<GameObject> GetSceneGameObjects()
         {

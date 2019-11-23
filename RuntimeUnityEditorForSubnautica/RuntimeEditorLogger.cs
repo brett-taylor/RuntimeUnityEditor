@@ -1,5 +1,4 @@
 ﻿using RuntimeUnityEditor.Core;
-using System;
 
 namespace RuntimeUnityEditorForSubnautica
 {
@@ -7,7 +6,7 @@ namespace RuntimeUnityEditorForSubnautica
     {
         public void Log(LogLevel logLevel, object content)
         {
-            if (logLevel == LogLevel.Warning || logLevel == LogLevel.Error || logLevel == LogLevel.Fatal)
+            if (logLevel == (LogLevel.Warning | LogLevel.Error | LogLevel.Fatal))
             {
                 ErrorMessage.AddMessage(content.ToString());
             }
