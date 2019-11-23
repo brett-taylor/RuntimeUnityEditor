@@ -25,7 +25,7 @@ namespace RuntimeUnityEditor.Core.REPL
 
         private readonly StringBuilder _sb = new StringBuilder();
 
-        private string _inputField = "";
+        public string InputField { get; set; } = "";
         private string _prevInput = "";
         private Vector2 _scrollPosition = Vector2.zero;
 
@@ -69,6 +69,8 @@ namespace RuntimeUnityEditor.Core.REPL
                 "using System.Linq;",
                 "using System.Collections;",
                 "using System.Collections.Generic;",
+                "using RuntimeUnityEditor.Core;",
+                "using RuntimeUnityEditor.Core.Inspector.Entries;",
             };
 
             foreach (var define in envSetup)
@@ -147,7 +149,7 @@ namespace RuntimeUnityEditor.Core.REPL
                 GUILayout.BeginHorizontal();
                 {
                     GUI.SetNextControlName("replInput");
-                    _inputField = GUILayout.TextArea(_inputField);
+                    InputField = GUILayout.TextArea(InputField);
 
                     if (_refocus)
                     {
@@ -203,7 +205,7 @@ namespace RuntimeUnityEditor.Core.REPL
 
         private void AcceptSuggestion(string suggestion)
         {
-            _inputField = _inputField.Insert(_textEditor.cursorIndex, suggestion);
+            InputField = InputField.Insert(_textEditor.cursorIndex, suggestion);
             _newCursorLocation = _textEditor.cursorIndex + suggestion.Length;
             ClearSuggestions();
         }
@@ -231,7 +233,7 @@ namespace RuntimeUnityEditor.Core.REPL
             if (_historyPosition < 0)
                 _historyPosition = _history.Count - 1;
 
-            _inputField = _history[_historyPosition];
+            InputField = _history[_historyPosition];
         }
 
         private void FetchSuggestions(string input)
@@ -296,7 +298,7 @@ namespace RuntimeUnityEditor.Core.REPL
                     {
                         // Fix pressing enter adding a newline in textarea
                         if (_textEditor.cursorIndex - 1 >= 0)
-                            _inputField = _inputField.Remove(_textEditor.cursorIndex - 1, 1);
+                            InputField = InputField.Remove(_textEditor.cursorIndex - 1, 1);
 
                         AcceptInput();
                         currentEvent.Use();
@@ -316,7 +318,7 @@ namespace RuntimeUnityEditor.Core.REPL
                 }
             }
 
-            var input = _inputField;
+            var input = InputField;
             if (!string.IsNullOrEmpty(input))
             {
                 try
@@ -353,36 +355,36 @@ namespace RuntimeUnityEditor.Core.REPL
             }
         }
 
-        private void AcceptInput()
+        public void AcceptInput()
         {
-            _inputField = _inputField.Trim();
+            InputField = InputField.Trim();
 
-            if (_inputField == "") return;
+            if (InputField == "") return;
 
-            _history.Add(_inputField);
+            _history.Add(InputField);
             if (_history.Count > HistoryLimit)
                 _history.RemoveRange(0, _history.Count - HistoryLimit);
             _historyPosition = 0;
 
-            if (_inputField.Contains("geti()"))
+            if (InputField.Contains("geti()"))
             {
                 try
                 {
                     var val = REPL.geti();
                     if (val != null)
-                        _inputField = _inputField.Replace("geti()", $"geti<{val.GetType().GetSourceCodeRepresentation()}>()");
+                        InputField = InputField.Replace("geti()", $"geti<{val.GetType().GetSourceCodeRepresentation()}>()");
                 }
                 catch (SystemException) { }
             }
 
-            _sb.AppendLine($"> {_inputField}");
-            var result = Evaluate(_inputField);
+            _sb.AppendLine($"> {InputField}");
+            var result = Evaluate(InputField);
             if (result != null && !Equals(result, VoidType.Value))
                 _sb.AppendLine(result.ToString());
 
             ScrollToBottom();
 
-            _inputField = string.Empty;
+            InputField = string.Empty;
             ClearSuggestions();
         }
 

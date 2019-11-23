@@ -11,7 +11,7 @@ namespace RuntimeUnityEditor.Core
 {
     public class RuntimeUnityEditorCore : MonoBehaviour
     {
-        public static RuntimeUnityEditorCore INSTANCE { get; }
+        public static RuntimeUnityEditorCore INSTANCE { get; private set; }
         internal static KeyCode SHOW_HOT_KEY { get; set; } = KeyCode.F7;
         internal static ILoggerWrapper LOGGER { get; private set; }
 
@@ -26,8 +26,8 @@ namespace RuntimeUnityEditor.Core
 
         public void Setup(ILoggerWrapper logger, string configPath)
         {
+            INSTANCE = this;
             LOGGER = logger;
-            Inspector = new Inspector.Inspector(targetTransform => TreeViewer.SelectAndShowObject(targetTransform));
             TreeViewer = new ObjectTreeViewer(this, _gameObjectSearcher)
             {
                 InspectorOpenCallback = items =>
@@ -57,6 +57,8 @@ namespace RuntimeUnityEditor.Core
                     LOGGER.Log(LogLevel.Warning, "Failed to load REPL - " + ex.Message);
                 }
             }
+
+            Inspector = new Inspector.Inspector(targetTransform => TreeViewer.SelectAndShowObject(targetTransform), Repl);
         }
 
         internal void OnGUI()

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using RuntimeUnityEditor.Core.Inspector.Entries;
+using RuntimeUnityEditor.Core.REPL;
 using RuntimeUnityEditor.Core.UI;
 using RuntimeUnityEditor.Core.Utils;
 using UnityEngine;
@@ -20,7 +21,8 @@ namespace RuntimeUnityEditor.Core.Inspector
         private readonly GUILayoutOption[] _inspectorTypeWidth = { GUILayout.Width(170), GUILayout.MaxWidth(170) };
         private readonly GUILayoutOption[] _inspectorNameWidth = { GUILayout.Width(240), GUILayout.MaxWidth(240) };
         private readonly GUILayoutOption _inspectorRecordHeight = GUILayout.Height(InspectorRecordHeight);
-        private readonly GUILayoutOption _dnSpyButtonOptions = GUILayout.Width(19);
+        private readonly GUILayoutOption _dnSpyButtonOptions = GUILayout.Width(50);
+        private readonly GUILayoutOption _createREPLVariableWidth = GUILayout.Width(80);
 
         private GUIStyle _alignedButtonStyle;
 
@@ -41,6 +43,14 @@ namespace RuntimeUnityEditor.Core.Inspector
         }
         private bool _focusSearchBox;
 
+        private string _createVariableString = "";
+        private string CreateVariableString
+        {
+            get => _createVariableString;
+            // The string can't be null under unity 5.x or we crash
+            set => _createVariableString = value ?? "";
+        }
+
         private readonly Dictionary<Type, bool> _canCovertCache = new Dictionary<Type, bool>();
         private readonly List<ICacheEntry> _fieldCache = new List<ICacheEntry>();
         private readonly Stack<InspectorStackEntryBase> _inspectorStack = new Stack<InspectorStackEntryBase>();
@@ -48,12 +58,15 @@ namespace RuntimeUnityEditor.Core.Inspector
         private InspectorStackEntryBase _nextToPush;
         private readonly int _windowId;
 
-        private InspectorStackEntryBase CurrentStackItem => _inspectorStack.Peek();
+        public InspectorStackEntryBase CurrentStackItem => _inspectorStack.Peek();
 
-        public Inspector(Action<Transform> treelistShowCallback)
+        private ReplWindow _replWindow;
+
+        public Inspector(Action<Transform> treelistShowCallback, ReplWindow replWindow)
         {
             _treelistShowCallback = treelistShowCallback ?? throw new ArgumentNullException(nameof(treelistShowCallback));
             _windowId = GetHashCode();
+            _replWindow = replWindow;
         }
 
         private static IEnumerable<ICacheEntry> MethodsToCacheEntries(object instance, Type instanceType, MethodInfo[] methodsToCheck)
@@ -271,6 +284,22 @@ namespace RuntimeUnityEditor.Core.Inspector
 
             _inspectorStack.Push(stackEntry);
             LoadStackEntry(stackEntry);
+
+            GenerateVariableName(stackEntry);
+        }
+
+        private void GenerateVariableName(InspectorStackEntryBase stackEntry)
+        {
+            if (stackEntry.Name.Length >= 2)
+            {
+                CreateVariableString = char.ToLowerInvariant(stackEntry.Name[0]) + stackEntry.Name.Substring(1);
+                CreateVariableString = CreateVariableString.Replace(" ", "");
+                CreateVariableString = CreateVariableString.Replace(":", "");
+            }
+            else
+            {
+                CreateVariableString = null;
+            }
         }
 
         public object GetInspectedObject()
@@ -371,6 +400,15 @@ namespace RuntimeUnityEditor.Core.Inspector
                     }
                     GUILayout.EndScrollView();
 
+                    GUILayout.BeginHorizontal(GUI.skin.box, GUILayout.ExpandWidth(true));
+                    {
+                        GUILayout.Label("Create REPL Variable:", GUILayout.ExpandWidth(false));
+                        CreateVariableString = GUILayout.TextField(CreateVariableString, GUILayout.ExpandWidth(true));
+                        if (GUILayout.Button("Create", _createREPLVariableWidth))
+                            CreateREPLVariable();
+                    }
+                    GUILayout.EndHorizontal();
+
                     GUILayout.BeginVertical(GUI.skin.box);
                     {
                         GUILayout.BeginHorizontal();
@@ -464,7 +502,7 @@ namespace RuntimeUnityEditor.Core.Inspector
                 else
                     DrawValue(value, GUILayout.ExpandWidth(true));
 
-                if (DnSpyHelper.IsAvailable && GUILayout.Button("^", _dnSpyButtonOptions))
+                if (DnSpyHelper.IsAvailable && GUILayout.Button("DNSpy", _dnSpyButtonOptions))
                     DnSpyHelper.OpenInDnSpy(entry);
             }
             GUILayout.EndHorizontal();
@@ -508,6 +546,15 @@ namespace RuntimeUnityEditor.Core.Inspector
                 InspectorPush(_nextToPush);
 
                 _nextToPush = null;
+            }
+        }
+
+        private void CreateREPLVariable()
+        {
+            if (CreateVariableString.Length > 0 && CurrentStackItem is InstanceStackEntry)
+            {
+                _replWindow.InputField = $"var {CreateVariableString} = ({((InstanceStackEntry)CurrentStackItem).Instance.GetType()}) ((InstanceStackEntry) RuntimeUnityEditorCore.INSTANCE.Inspector.CurrentStackItem).Instance;";
+                _replWindow.AcceptInput();
             }
         }
     }
