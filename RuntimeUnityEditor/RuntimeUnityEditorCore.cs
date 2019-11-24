@@ -132,17 +132,7 @@ namespace RuntimeUnityEditor.Core
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
 
-                LayerMask layMask = ~(1 << LayerMask.NameToLayer("layer19"));
-
-                if (Input.GetMouseButtonDown(0))
-                {
-                    Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, layMask);
-                    INSTANCE.TreeViewer.SelectAndShowObject(hit.transform);
-                } else if (Input.GetMouseButtonDown(1))
-                {
-                    Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, layMask);
-                    INSTANCE.TreeViewer.SelectAndShowObject(hit.collider.transform);
-                }
+                TreeViewer.Update();
             }
         }
 

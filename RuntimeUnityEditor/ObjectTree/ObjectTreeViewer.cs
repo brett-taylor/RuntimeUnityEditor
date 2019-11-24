@@ -29,6 +29,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
         private int _singleObjectTreeItemHeight;
         private bool _scrollTreeToSelected;
         private bool _enabled;
+        private readonly LayerMask _clickMask = ~(1 << LayerMask.NameToLayer("layer19"));
         private readonly GameObjectSearcher _gameObjectSearcher;
         private readonly Dictionary<Image, Texture2D> _imagePreviewCache = new Dictionary<Image, Texture2D>();
         private readonly GUILayoutOption _drawVector3FieldWidth = GUILayout.Width(38);
@@ -211,6 +212,23 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             {
                 _windowRect = GUILayout.Window(_windowId, _windowRect, WindowFunc, "Scene Object Browser");
                 InterfaceMaker.EatInputInRect(_windowRect);
+            }
+        }
+
+        public void Update()
+        {
+            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
+            {
+                Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, _clickMask);
+
+                if (Input.GetMouseButtonDown(0))
+                {
+                    SelectAndShowObject(hit.transform);
+                }
+                else if (Input.GetMouseButtonDown(1))
+                {
+                    SelectAndShowObject(hit.collider.transform);
+                }
             }
         }
 
