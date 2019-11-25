@@ -35,7 +35,6 @@ namespace RuntimeUnityEditor.Core.Utils
         public static bool SupportsScenes { get; private set; }
         public static bool SupportsXml { get; }
         public static bool SupportsCursorIndex { get; }
-        public static bool SupportsVectrosity => true;
 
         public static IEnumerable<GameObject> GetSceneGameObjects()
         {

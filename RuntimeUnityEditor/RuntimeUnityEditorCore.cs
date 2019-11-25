@@ -44,11 +44,8 @@ namespace RuntimeUnityEditor.Core
                 }
             };
 
-            if (UnityFeatureHelper.SupportsVectrosity)
-            {
-                _gizmoDrawer = new GizmoDrawer(this);
-                TreeViewer.TreeSelectionChangedCallback = transform => _gizmoDrawer.UpdateState(transform);
-            }
+            _gizmoDrawer = new GizmoDrawer(this);
+            TreeViewer.TreeSelectionChangedCallback = transform => _gizmoDrawer.UpdateState(transform);
 
             if (UnityFeatureHelper.SupportsCursorIndex &&
                 UnityFeatureHelper.SupportsXml)

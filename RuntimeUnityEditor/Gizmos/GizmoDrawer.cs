@@ -31,8 +31,6 @@ namespace RuntimeUnityEditor.Core.Gizmos
 
         public static void DisplayControls()
         {
-            if (!UnityFeatureHelper.SupportsVectrosity) return;
-
             GUILayout.BeginHorizontal(GUI.skin.box);
             {
                 ShowGizmos = GUILayout.Toggle(ShowGizmos, "Show gizmos for selection");
