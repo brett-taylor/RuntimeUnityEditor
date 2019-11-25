@@ -15,29 +15,18 @@ namespace RuntimeUnityEditor.Core.Gizmos
 
         public ICollection<IGizmoEntry> Lines => _lines;
 
-        public GizmoDrawer(MonoBehaviour coroutineTarget)
+        private Settings.Settings _settings;
+
+        public GizmoDrawer(MonoBehaviour coroutineTarget, Settings.Settings settings)
         {
             coroutineTarget.StartCoroutine(EndOfFrame());
+            _settings = settings;
         }
 
         public bool Show
         {
-            get => ShowGizmos && (_show || ShowGizmosOutsideEditor);
+            get => _settings.ShowGizmos && (_show || _settings.ShowGizmosOutsideEditor);
             set => _show = value;
-        }
-
-        public static bool ShowGizmos { get; set; }
-        public static bool ShowGizmosOutsideEditor { get; set; }
-
-        public static void DisplayControls()
-        {
-            GUILayout.BeginHorizontal(GUI.skin.box);
-            {
-                ShowGizmos = GUILayout.Toggle(ShowGizmos, "Show gizmos for selection");
-                ShowGizmosOutsideEditor = GUILayout.Toggle(ShowGizmosOutsideEditor, "Always show");
-                GUILayout.FlexibleSpace();
-            }
-            GUILayout.EndHorizontal();
         }
 
         public void UpdateState(Transform rootTransform)

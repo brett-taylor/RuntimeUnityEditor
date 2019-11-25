@@ -44,7 +44,7 @@ namespace RuntimeUnityEditor.Core
                 }
             };
 
-            _gizmoDrawer = new GizmoDrawer(this);
+            _gizmoDrawer = new GizmoDrawer(this, Settings);
             TreeViewer.TreeSelectionChangedCallback = transform => _gizmoDrawer.UpdateState(transform);
 
             if (UnityFeatureHelper.SupportsCursorIndex &&

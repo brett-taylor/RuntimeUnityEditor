@@ -42,6 +42,7 @@ namespace RuntimeUnityEditor.Core.Settings
         private void DrawExpanded()
         {
             DrawClickForGameObjectBehaviour();
+            DrawGizmosSettings();
         }
 
         private void DrawClickForGameObjectBehaviour()
@@ -61,6 +62,17 @@ namespace RuntimeUnityEditor.Core.Settings
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndVertical();
+        }
+
+        private void DrawGizmosSettings()
+        {
+            GUILayout.BeginHorizontal(GUI.skin.box);
+            {
+                _settings.ShowGizmos = GUILayout.Toggle(_settings.ShowGizmos, "Show gizmos for selection");
+                _settings.ShowGizmosOutsideEditor = GUILayout.Toggle(_settings.ShowGizmosOutsideEditor, "Always show");
+                GUILayout.FlexibleSpace();
+            }
+            GUILayout.EndHorizontal();
         }
     }
 }
