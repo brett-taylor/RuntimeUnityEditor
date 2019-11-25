@@ -3,6 +3,7 @@ using System.IO;
 using RuntimeUnityEditor.Core.Gizmos;
 using RuntimeUnityEditor.Core.ObjectTree;
 using RuntimeUnityEditor.Core.REPL;
+using RuntimeUnityEditor.Core.Settings;
 using RuntimeUnityEditor.Core.UI;
 using RuntimeUnityEditor.Core.Utils;
 using UnityEngine;
@@ -18,6 +19,8 @@ namespace RuntimeUnityEditor.Core
         public Inspector.Inspector Inspector { get; private set; }
         public ObjectTreeViewer TreeViewer { get; private set; }
         public ReplWindow Repl { get; private set; }
+        public Settings.Settings Settings { get; private set; }
+        public SettingsViewer SettingsViewer { get; private set; }
 
         private GizmoDrawer _gizmoDrawer;
         private GameObjectSearcher _gameObjectSearcher = new GameObjectSearcher();
@@ -28,6 +31,9 @@ namespace RuntimeUnityEditor.Core
         {
             INSTANCE = this;
             LOGGER = logger;
+            Settings = new Settings.Settings();
+            SettingsViewer = new SettingsViewer();
+
             TreeViewer = new ObjectTreeViewer(this, _gameObjectSearcher)
             {
                 InspectorOpenCallback = items =>
