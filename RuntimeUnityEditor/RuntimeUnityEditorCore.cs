@@ -32,9 +32,9 @@ namespace RuntimeUnityEditor.Core
             INSTANCE = this;
             LOGGER = logger;
             Settings = new Settings.Settings();
-            SettingsViewer = new SettingsViewer();
+            SettingsViewer = new SettingsViewer(Settings);
 
-            TreeViewer = new ObjectTreeViewer(this, _gameObjectSearcher)
+            TreeViewer = new ObjectTreeViewer(this, _gameObjectSearcher, SettingsViewer, Settings)
             {
                 InspectorOpenCallback = items =>
                 {

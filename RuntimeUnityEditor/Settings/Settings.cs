@@ -2,5 +2,7 @@
 {
     public class Settings
     {
+        public bool EnableClickForParentGameObject { get; set; } = false;
+        public bool EnableClickForChildGameObject { get; set; } = false;
     }
 }

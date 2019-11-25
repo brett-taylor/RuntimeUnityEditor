@@ -6,6 +6,7 @@ using System.Linq;
 using RuntimeUnityEditor.Core.Gizmos;
 using RuntimeUnityEditor.Core.Inspector;
 using RuntimeUnityEditor.Core.Inspector.Entries;
+using RuntimeUnityEditor.Core.Settings;
 using RuntimeUnityEditor.Core.UI;
 using RuntimeUnityEditor.Core.Utils;
 using UnityEngine;
@@ -29,8 +30,6 @@ namespace RuntimeUnityEditor.Core.ObjectTree
         private int _singleObjectTreeItemHeight;
         private bool _scrollTreeToSelected;
         private bool _enabled;
-        private bool _enableClickForParentGameObject = false;
-        private bool _enableClickForChildGameObject = false;
         private readonly LayerMask _clickMask = ~(1 << LayerMask.NameToLayer("layer19"));
         private readonly GameObjectSearcher _gameObjectSearcher;
         private readonly Dictionary<Image, Texture2D> _imagePreviewCache = new Dictionary<Image, Texture2D>();
@@ -39,6 +38,21 @@ namespace RuntimeUnityEditor.Core.ObjectTree
         private readonly GUILayoutOption _drawVector3SliderHeight = GUILayout.Height(10);
         private readonly GUILayoutOption _drawVector3SliderWidth = GUILayout.Width(33);
         private readonly int _windowId;
+        private SettingsViewer _settingsViewer;
+        private Settings.Settings _settings;
+        private bool _wireframe;
+        private bool _actuallyInsideOnGui;
+
+        public ObjectTreeViewer(MonoBehaviour pluginObject, GameObjectSearcher gameObjectSearcher, SettingsViewer settingsViewer, Settings.Settings settings)
+        {
+            if (pluginObject == null) throw new ArgumentNullException(nameof(pluginObject));
+            _gameObjectSearcher = gameObjectSearcher ?? throw new ArgumentNullException(nameof(gameObjectSearcher));
+            _windowId = GetHashCode();
+            _settingsViewer = settingsViewer;
+            _settings = settings;
+
+            pluginObject.StartCoroutine(SetWireframeCo());
+        }
 
         public void SelectAndShowObject(Transform target)
         {
@@ -56,20 +70,6 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             _scrollTreeToSelected = true;
             Enabled = true;
         }
-
-        public ObjectTreeViewer(MonoBehaviour pluginObject, GameObjectSearcher gameObjectSearcher)
-        {
-            if (pluginObject == null) throw new ArgumentNullException(nameof(pluginObject));
-            if (gameObjectSearcher == null) throw new ArgumentNullException(nameof(gameObjectSearcher));
-
-            _gameObjectSearcher = gameObjectSearcher;
-            _windowId = GetHashCode();
-
-            pluginObject.StartCoroutine(SetWireframeCo());
-        }
-
-        private bool _wireframe;
-        private bool _actuallyInsideOnGui;
 
         private IEnumerator SetWireframeCo()
         {
@@ -219,8 +219,8 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
         public void Update()
         {
-            bool isLeftClickDown = _enableClickForParentGameObject && Input.GetMouseButtonDown(0);
-            bool isRightClickDown = _enableClickForChildGameObject && Input.GetMouseButtonDown(1);
+            bool isLeftClickDown = _settings.EnableClickForParentGameObject && Input.GetMouseButtonDown(0);
+            bool isRightClickDown = _settings.EnableClickForChildGameObject && Input.GetMouseButtonDown(1);
 
             if (isLeftClickDown || isRightClickDown)
             {
@@ -241,13 +241,13 @@ namespace RuntimeUnityEditor.Core.ObjectTree
         {
             GUILayout.BeginVertical();
             {
-                DrawSettings();
-
                 DisplayObjectTree();
 
                 DisplayControls();
 
                 DisplayObjectProperties();
+
+                _settingsViewer.DrawSettingsMenu();
             }
             GUILayout.EndHorizontal();
 
@@ -594,25 +594,6 @@ namespace RuntimeUnityEditor.Core.ObjectTree
                 }
             }
             GUILayout.EndHorizontal();
-        }
-
-        private void DrawSettings()
-        {
-            GUILayout.BeginVertical(GUI.skin.box);
-            {
-                GUILayout.BeginHorizontal();
-                {
-                    _enableClickForParentGameObject = GUILayout.Toggle(_enableClickForParentGameObject, "Left click for parent GameObject");
-                }
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal();
-                {
-                    _enableClickForChildGameObject = GUILayout.Toggle(_enableClickForChildGameObject, "Right click for child GameObject");
-                }
-                GUILayout.EndHorizontal();
-            }
-            GUILayout.EndVertical();
         }
     }
 }
