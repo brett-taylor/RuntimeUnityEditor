@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Globalization;
+using UnityEngine;
 
 namespace RuntimeUnityEditor.Core.Settings
 {
@@ -6,7 +7,9 @@ namespace RuntimeUnityEditor.Core.Settings
     {
         private Settings _settings;
         private bool _expanded = false;
+
         private readonly GUILayoutOption _collapseExpandButtonOptions = GUILayout.Width(70);
+        private readonly GUILayoutOption _setTimeBox = GUILayout.Width(38);
 
         public SettingsViewer(Settings settings)
         {
@@ -43,6 +46,7 @@ namespace RuntimeUnityEditor.Core.Settings
         {
             DrawClickForGameObjectBehaviour();
             DrawGizmosSettings();
+            DrawTimeSettings();
         }
 
         private void DrawClickForGameObjectBehaviour()
@@ -51,13 +55,13 @@ namespace RuntimeUnityEditor.Core.Settings
             {
                 GUILayout.BeginHorizontal();
                 {
-                    _settings.EnableClickForParentGameObject = GUILayout.Toggle(_settings.EnableClickForParentGameObject, "Left click for parent GameObject");
+                    _settings.EnableClickForParentGameObject = GUILayout.Toggle(_settings.EnableClickForParentGameObject, "Left click for parent game object");
                 }
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 {
-                    _settings.EnableClickForChildGameObject = GUILayout.Toggle(_settings.EnableClickForChildGameObject, "Right click for child GameObject");
+                    _settings.EnableClickForChildGameObject = GUILayout.Toggle(_settings.EnableClickForChildGameObject, "Right click for child game object");
                 }
                 GUILayout.EndHorizontal();
             }
@@ -70,7 +74,23 @@ namespace RuntimeUnityEditor.Core.Settings
             {
                 _settings.ShowGizmos = GUILayout.Toggle(_settings.ShowGizmos, "Show gizmos for selection");
                 _settings.ShowGizmosOutsideEditor = GUILayout.Toggle(_settings.ShowGizmosOutsideEditor, "Always show");
-                GUILayout.FlexibleSpace();
+            }
+            GUILayout.EndHorizontal();
+        }
+
+        private void DrawTimeSettings()
+        {
+            GUILayout.BeginHorizontal(GUI.skin.box);
+            {
+                GUILayout.Label("Time", GUILayout.ExpandWidth(false));
+
+                if (GUILayout.Button(">", GUILayout.ExpandWidth(false)))
+                    Time.timeScale = 1;
+                if (GUILayout.Button("||", GUILayout.ExpandWidth(false)))
+                    Time.timeScale = 0;
+
+                if (float.TryParse(GUILayout.TextField(Time.timeScale.ToString("F2", CultureInfo.InvariantCulture), _setTimeBox), NumberStyles.Any, CultureInfo.InvariantCulture, out var newVal))
+                    Time.timeScale = newVal;
             }
             GUILayout.EndHorizontal();
         }
