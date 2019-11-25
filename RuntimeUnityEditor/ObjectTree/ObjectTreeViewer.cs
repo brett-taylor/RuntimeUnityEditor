@@ -40,7 +40,6 @@ namespace RuntimeUnityEditor.Core.ObjectTree
         private readonly int _windowId;
         private SettingsViewer _settingsViewer;
         private Settings.Settings _settings;
-        private bool _wireframe;
         private bool _actuallyInsideOnGui;
 
         public ObjectTreeViewer(MonoBehaviour pluginObject, GameObjectSearcher gameObjectSearcher, SettingsViewer settingsViewer, Settings.Settings settings)
@@ -81,8 +80,8 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
                 yield return new WaitForEndOfFrame();
 
-                if (GL.wireframe != _wireframe)
-                    GL.wireframe = _wireframe;
+                if (GL.wireframe != _settings.Wireframe)
+                    GL.wireframe = _settings.Wireframe;
 
                 _actuallyInsideOnGui = false;
             }
@@ -207,7 +206,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
         public void DisplayViewer()
         {
-            if (_wireframe && _actuallyInsideOnGui && Event.current.type == EventType.Layout)
+            if (_settings.Wireframe && _actuallyInsideOnGui && Event.current.type == EventType.Layout)
                 GL.wireframe = false;
 
             if (Enabled)
@@ -265,8 +264,6 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
                 if (GUILayout.Button("Log", GUILayout.ExpandWidth(false)))
                     UnityFeatureHelper.OpenLog();
-
-                _wireframe = GUILayout.Toggle(_wireframe, "Wireframe");
             }
             GUILayout.EndHorizontal();
 

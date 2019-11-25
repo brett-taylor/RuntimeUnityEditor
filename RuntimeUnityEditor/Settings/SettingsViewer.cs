@@ -47,6 +47,7 @@ namespace RuntimeUnityEditor.Core.Settings
             DrawClickForGameObjectBehaviour();
             DrawGizmosSettings();
             DrawTimeSettings();
+            DrawWireFrame();
         }
 
         private void DrawClickForGameObjectBehaviour()
@@ -91,6 +92,15 @@ namespace RuntimeUnityEditor.Core.Settings
 
                 if (float.TryParse(GUILayout.TextField(Time.timeScale.ToString("F2", CultureInfo.InvariantCulture), _setTimeBox), NumberStyles.Any, CultureInfo.InvariantCulture, out var newVal))
                     Time.timeScale = newVal;
+            }
+            GUILayout.EndHorizontal();
+        }
+
+        private void DrawWireFrame()
+        {
+            GUILayout.BeginHorizontal(GUI.skin.box);
+            {
+                _settings.Wireframe = GUILayout.Toggle(_settings.Wireframe, "Wireframe");
             }
             GUILayout.EndHorizontal();
         }
