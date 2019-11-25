@@ -32,9 +32,9 @@ namespace RuntimeUnityEditor.Core
             INSTANCE = this;
             LOGGER = logger;
             Settings = new Settings.Settings();
-            SettingsViewer = new SettingsViewer(Settings);
+            SettingsViewer = new SettingsViewer();
 
-            TreeViewer = new ObjectTreeViewer(this, _gameObjectSearcher, SettingsViewer, Settings)
+            TreeViewer = new ObjectTreeViewer(this, _gameObjectSearcher)
             {
                 InspectorOpenCallback = items =>
                 {
@@ -44,7 +44,7 @@ namespace RuntimeUnityEditor.Core
                 }
             };
 
-            _gizmoDrawer = new GizmoDrawer(this, Settings);
+            _gizmoDrawer = new GizmoDrawer(this);
             TreeViewer.TreeSelectionChangedCallback = transform => _gizmoDrawer.UpdateState(transform);
 
             if (UnityFeatureHelper.SupportsCursorIndex &&

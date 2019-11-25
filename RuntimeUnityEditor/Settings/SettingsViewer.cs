@@ -1,20 +1,16 @@
-﻿using System.Globalization;
+﻿using RuntimeUnityEditor.Core.Utils;
+using System.Globalization;
 using UnityEngine;
 
 namespace RuntimeUnityEditor.Core.Settings
 {
     public class SettingsViewer
     {
-        private Settings _settings;
         private bool _expanded = false;
 
         private readonly GUILayoutOption _collapseExpandButtonOptions = GUILayout.Width(70);
         private readonly GUILayoutOption _setTimeBox = GUILayout.Width(38);
 
-        public SettingsViewer(Settings settings)
-        {
-            _settings = settings;
-        }
 
         public void DrawSettingsMenu()
         {
@@ -44,10 +40,9 @@ namespace RuntimeUnityEditor.Core.Settings
 
         private void DrawExpanded()
         {
-            DrawClickForGameObjectBehaviour();
+            DrawMiscSettings();
             DrawGizmosSettings();
-            DrawTimeSettings();
-            DrawWireFrame();
+            DrawClickForGameObjectBehaviour();
         }
 
         private void DrawClickForGameObjectBehaviour()
@@ -56,13 +51,13 @@ namespace RuntimeUnityEditor.Core.Settings
             {
                 GUILayout.BeginHorizontal();
                 {
-                    _settings.EnableClickForParentGameObject = GUILayout.Toggle(_settings.EnableClickForParentGameObject, "Left click for parent game object");
+                    RuntimeUnityEditorCore.INSTANCE.Settings.EnableClickForParentGameObject = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.Settings.EnableClickForParentGameObject, "Left click for parent game object");
                 }
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 {
-                    _settings.EnableClickForChildGameObject = GUILayout.Toggle(_settings.EnableClickForChildGameObject, "Right click for child game object");
+                    RuntimeUnityEditorCore.INSTANCE.Settings.EnableClickForChildGameObject = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.Settings.EnableClickForChildGameObject, "Right click for child game object");
                 }
                 GUILayout.EndHorizontal();
             }
@@ -73,16 +68,30 @@ namespace RuntimeUnityEditor.Core.Settings
         {
             GUILayout.BeginHorizontal(GUI.skin.box);
             {
-                _settings.ShowGizmos = GUILayout.Toggle(_settings.ShowGizmos, "Show gizmos for selection");
-                _settings.ShowGizmosOutsideEditor = GUILayout.Toggle(_settings.ShowGizmosOutsideEditor, "Always show");
+                RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmos = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmos, "Show gizmos for selection");
+
+                RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmosOutsideEditor = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmosOutsideEditor, "Always show");
             }
             GUILayout.EndHorizontal();
         }
 
-        private void DrawTimeSettings()
+        private void DrawMiscSettings()
         {
             GUILayout.BeginHorizontal(GUI.skin.box);
             {
+                if (RuntimeUnityEditorCore.INSTANCE.TreeViewer.SelectedTransform == null)
+                    GUI.enabled = false;
+
+                if (GUILayout.Button("Dump", GUILayout.ExpandWidth(false)))
+                    SceneDumper.DumpObjects(RuntimeUnityEditorCore.INSTANCE.TreeViewer.SelectedTransform?.gameObject);
+
+                GUI.enabled = true;
+
+                if (GUILayout.Button("Log", GUILayout.ExpandWidth(false)))
+                    UnityFeatureHelper.OpenLog();
+
+                GUILayout.FlexibleSpace();
+
                 GUILayout.Label("Time", GUILayout.ExpandWidth(false));
 
                 if (GUILayout.Button(">", GUILayout.ExpandWidth(false)))
@@ -92,15 +101,10 @@ namespace RuntimeUnityEditor.Core.Settings
 
                 if (float.TryParse(GUILayout.TextField(Time.timeScale.ToString("F2", CultureInfo.InvariantCulture), _setTimeBox), NumberStyles.Any, CultureInfo.InvariantCulture, out var newVal))
                     Time.timeScale = newVal;
-            }
-            GUILayout.EndHorizontal();
-        }
 
-        private void DrawWireFrame()
-        {
-            GUILayout.BeginHorizontal(GUI.skin.box);
-            {
-                _settings.Wireframe = GUILayout.Toggle(_settings.Wireframe, "Wireframe");
+                GUILayout.FlexibleSpace();
+
+                RuntimeUnityEditorCore.INSTANCE.Settings.Wireframe = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.Settings.Wireframe, "Wireframe");
             }
             GUILayout.EndHorizontal();
         }

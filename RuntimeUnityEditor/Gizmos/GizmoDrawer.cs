@@ -15,17 +15,14 @@ namespace RuntimeUnityEditor.Core.Gizmos
 
         public ICollection<IGizmoEntry> Lines => _lines;
 
-        private Settings.Settings _settings;
-
-        public GizmoDrawer(MonoBehaviour coroutineTarget, Settings.Settings settings)
+        public GizmoDrawer(MonoBehaviour coroutineTarget)
         {
             coroutineTarget.StartCoroutine(EndOfFrame());
-            _settings = settings;
         }
 
         public bool Show
         {
-            get => _settings.ShowGizmos && (_show || _settings.ShowGizmosOutsideEditor);
+            get => RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmos && (_show || RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmosOutsideEditor);
             set => _show = value;
         }
 

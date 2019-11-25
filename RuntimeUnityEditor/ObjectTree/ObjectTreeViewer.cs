@@ -38,17 +38,13 @@ namespace RuntimeUnityEditor.Core.ObjectTree
         private readonly GUILayoutOption _drawVector3SliderHeight = GUILayout.Height(10);
         private readonly GUILayoutOption _drawVector3SliderWidth = GUILayout.Width(33);
         private readonly int _windowId;
-        private SettingsViewer _settingsViewer;
-        private Settings.Settings _settings;
         private bool _actuallyInsideOnGui;
 
-        public ObjectTreeViewer(MonoBehaviour pluginObject, GameObjectSearcher gameObjectSearcher, SettingsViewer settingsViewer, Settings.Settings settings)
+        public ObjectTreeViewer(MonoBehaviour pluginObject, GameObjectSearcher gameObjectSearcher)
         {
             if (pluginObject == null) throw new ArgumentNullException(nameof(pluginObject));
             _gameObjectSearcher = gameObjectSearcher ?? throw new ArgumentNullException(nameof(gameObjectSearcher));
             _windowId = GetHashCode();
-            _settingsViewer = settingsViewer;
-            _settings = settings;
 
             pluginObject.StartCoroutine(SetWireframeCo());
         }
@@ -80,8 +76,8 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
                 yield return new WaitForEndOfFrame();
 
-                if (GL.wireframe != _settings.Wireframe)
-                    GL.wireframe = _settings.Wireframe;
+                if (GL.wireframe != RuntimeUnityEditorCore.INSTANCE.Settings.Wireframe)
+                    GL.wireframe = RuntimeUnityEditorCore.INSTANCE.Settings.Wireframe;
 
                 _actuallyInsideOnGui = false;
             }
@@ -206,7 +202,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
         public void DisplayViewer()
         {
-            if (_settings.Wireframe && _actuallyInsideOnGui && Event.current.type == EventType.Layout)
+            if (RuntimeUnityEditorCore.INSTANCE.Settings.Wireframe && _actuallyInsideOnGui && Event.current.type == EventType.Layout)
                 GL.wireframe = false;
 
             if (Enabled)
@@ -218,8 +214,8 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
         public void Update()
         {
-            bool isLeftClickDown = _settings.EnableClickForParentGameObject && Input.GetMouseButtonDown(0);
-            bool isRightClickDown = _settings.EnableClickForChildGameObject && Input.GetMouseButtonDown(1);
+            bool isLeftClickDown = RuntimeUnityEditorCore.INSTANCE.Settings.EnableClickForParentGameObject && Input.GetMouseButtonDown(0);
+            bool isRightClickDown = RuntimeUnityEditorCore.INSTANCE.Settings.EnableClickForChildGameObject && Input.GetMouseButtonDown(1);
 
             if (isLeftClickDown || isRightClickDown)
             {
@@ -246,7 +242,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
                 DisplayObjectProperties();
 
-                _settingsViewer.DrawSettingsMenu();
+                RuntimeUnityEditorCore.INSTANCE.SettingsViewer.DrawSettingsMenu();
             }
             GUILayout.EndHorizontal();
 
@@ -255,18 +251,6 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
         private void DisplayControls()
         {
-            GUILayout.BeginHorizontal(GUI.skin.box);
-            {
-                if (SelectedTransform == null) GUI.enabled = false;
-                if (GUILayout.Button("Dump", GUILayout.ExpandWidth(false)))
-                    SceneDumper.DumpObjects(SelectedTransform?.gameObject);
-                GUI.enabled = true;
-
-                if (GUILayout.Button("Log", GUILayout.ExpandWidth(false)))
-                    UnityFeatureHelper.OpenLog();
-            }
-            GUILayout.EndHorizontal();
-
             AssetBundleManagerHelper.DrawButtonIfAvailable();
         }
 
