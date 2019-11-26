@@ -33,8 +33,7 @@ namespace RuntimeUnityEditor.Core
             LOGGER = logger;
 
             SettingsData = SettingsManager.LoadOrCreate();
-            if (string.IsNullOrEmpty(SettingsData.DNSpyPath) == false)
-                DnSpyHelper.DnSpyPath = SettingsData.DNSpyPath;
+            DnSpyHelper.SetPath(SettingsData.DNSpyPath, false);
 
             SettingsViewer = new SettingsViewer();
             TreeViewer = new ObjectTreeViewer(this, _gameObjectSearcher)

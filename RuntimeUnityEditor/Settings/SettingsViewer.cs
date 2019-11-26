@@ -10,7 +10,7 @@ namespace RuntimeUnityEditor.Core.Settings
         private readonly GUILayoutOption _collapseExpandButtonOptions = GUILayout.Width(70);
         private readonly GUILayoutOption _saveSettingsButtonOptions = GUILayout.Width(120);
         private readonly GUILayoutOption _setTimeBoxOptions = GUILayout.Width(38);
-        private readonly GUILayoutOption _saveDNSpyPathOptions = GUILayout.Width(70);
+        private readonly GUILayoutOption _saveDNSpyPathOptions = GUILayout.Width(35);
 
         public void DrawSettingsMenu()
         {
@@ -125,8 +125,8 @@ namespace RuntimeUnityEditor.Core.Settings
                 GUILayout.BeginHorizontal();
                 {
                     RuntimeUnityEditorCore.INSTANCE.SettingsData.DNSpyPath = GUILayout.TextField(RuntimeUnityEditorCore.INSTANCE.SettingsData.DNSpyPath);
-                    if (GUILayout.Button("Save", _saveDNSpyPathOptions))
-                        DnSpyHelper.DnSpyPath = RuntimeUnityEditorCore.INSTANCE.SettingsData.DNSpyPath;
+                    if (GUILayout.Button("Set", _saveDNSpyPathOptions))
+                        DnSpyHelper.SetPath(RuntimeUnityEditorCore.INSTANCE.SettingsData.DNSpyPath);
                 }
                 GUILayout.EndHorizontal();
             }
