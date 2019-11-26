@@ -114,7 +114,7 @@ namespace RuntimeUnityEditor.Core.Settings
         {
             GUILayout.BeginVertical(GUI.skin.box);
             {
-                GUILayout.Label("DNSpy Settings");
+                GUILayout.Label("DNSpy Path");
                 GUILayout.BeginHorizontal();
                 {
                     RuntimeUnityEditorCore.INSTANCE.Settings.DNSpyPath = GUILayout.TextField(RuntimeUnityEditorCore.INSTANCE.Settings.DNSpyPath);
