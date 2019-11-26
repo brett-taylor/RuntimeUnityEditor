@@ -7,5 +7,6 @@
         public bool ShowGizmos { get; set; } = false;
         public bool ShowGizmosOutsideEditor { get; set; } = false;
         public bool Wireframe { get; set; } = false;
+        public string DNSpyPath { get; set; } = "";
     }
 }

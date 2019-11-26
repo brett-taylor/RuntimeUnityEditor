@@ -1,5 +1,7 @@
 ﻿using RuntimeUnityEditor.Core.Utils;
+using System;
 using System.Globalization;
+using System.IO;
 using UnityEngine;
 
 namespace RuntimeUnityEditor.Core.Settings
@@ -7,10 +9,9 @@ namespace RuntimeUnityEditor.Core.Settings
     public class SettingsViewer
     {
         private bool _expanded = false;
-
         private readonly GUILayoutOption _collapseExpandButtonOptions = GUILayout.Width(70);
-        private readonly GUILayoutOption _setTimeBox = GUILayout.Width(38);
-
+        private readonly GUILayoutOption _setTimeBoxOptions = GUILayout.Width(38);
+        private readonly GUILayoutOption _saveDNSpyPathOptions = GUILayout.Width(70);
 
         public void DrawSettingsMenu()
         {
@@ -43,6 +44,7 @@ namespace RuntimeUnityEditor.Core.Settings
             DrawMiscSettings();
             DrawGizmosSettings();
             DrawClickForGameObjectBehaviour();
+            DrawDNSpySettings();
         }
 
         private void DrawClickForGameObjectBehaviour()
@@ -66,13 +68,12 @@ namespace RuntimeUnityEditor.Core.Settings
 
         private void DrawGizmosSettings()
         {
-            GUILayout.BeginHorizontal(GUI.skin.box);
+            GUILayout.BeginVertical(GUI.skin.box);
             {
                 RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmos = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmos, "Show gizmos for selection");
-
-                RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmosOutsideEditor = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmosOutsideEditor, "Always show");
+                RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmosOutsideEditor = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmosOutsideEditor, "Show gizmos outside editor");
             }
-            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
         }
 
         private void DrawMiscSettings()
@@ -99,7 +100,7 @@ namespace RuntimeUnityEditor.Core.Settings
                 if (GUILayout.Button("||", GUILayout.ExpandWidth(false)))
                     Time.timeScale = 0;
 
-                if (float.TryParse(GUILayout.TextField(Time.timeScale.ToString("F2", CultureInfo.InvariantCulture), _setTimeBox), NumberStyles.Any, CultureInfo.InvariantCulture, out var newVal))
+                if (float.TryParse(GUILayout.TextField(Time.timeScale.ToString("F2", CultureInfo.InvariantCulture), _setTimeBoxOptions), NumberStyles.Any, CultureInfo.InvariantCulture, out var newVal))
                     Time.timeScale = newVal;
 
                 GUILayout.FlexibleSpace();
@@ -107,6 +108,22 @@ namespace RuntimeUnityEditor.Core.Settings
                 RuntimeUnityEditorCore.INSTANCE.Settings.Wireframe = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.Settings.Wireframe, "Wireframe");
             }
             GUILayout.EndHorizontal();
+        }
+
+        private void DrawDNSpySettings()
+        {
+            GUILayout.BeginVertical(GUI.skin.box);
+            {
+                GUILayout.Label("DNSpy Settings");
+                GUILayout.BeginHorizontal();
+                {
+                    RuntimeUnityEditorCore.INSTANCE.Settings.DNSpyPath = GUILayout.TextField(RuntimeUnityEditorCore.INSTANCE.Settings.DNSpyPath);
+                    if (GUILayout.Button("Save", _saveDNSpyPathOptions))
+                        DnSpyHelper.DnSpyPath = RuntimeUnityEditorCore.INSTANCE.Settings.DNSpyPath;
+                }
+                GUILayout.EndHorizontal();
+            }
+            GUILayout.EndVertical();
         }
     }
 }

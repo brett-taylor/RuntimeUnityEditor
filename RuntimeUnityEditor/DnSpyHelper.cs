@@ -23,9 +23,18 @@ namespace RuntimeUnityEditor.Core
                 if (!string.IsNullOrEmpty(_dnSpyPath))
                 {
                     if (File.Exists(_dnSpyPath) && _dnSpyPath.EndsWith("dnspy.exe", StringComparison.OrdinalIgnoreCase))
+                    {
                         IsAvailable = true;
+                        string message = "[DnSpyHelper] dnSpy path set";
+                        ErrorMessage.AddMessage(message);
+                        RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Message, message);
+                    }
                     else
-                        RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Error | LogLevel.Message, "[DnSpyHelper] Invalid dnSpy path. The path has to point to 64bit dnSpy.exe");
+                    {
+                        string message = "[DnSpyHelper] Invalid dnSpy path. The path has to point to 64bit dnSpy.exe";
+                        ErrorMessage.AddMessage(message);
+                        RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Error | LogLevel.Message, message);
+                    }
                 }
             }
         }
