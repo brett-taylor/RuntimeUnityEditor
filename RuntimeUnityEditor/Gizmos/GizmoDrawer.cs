@@ -22,7 +22,7 @@ namespace RuntimeUnityEditor.Core.Gizmos
 
         public bool Show
         {
-            get => RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmos && (_show || RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmosOutsideEditor);
+            get => RuntimeUnityEditorCore.INSTANCE.SettingsData.ShowGizmos && (_show || RuntimeUnityEditorCore.INSTANCE.SettingsData.ShowGizmosOutsideEditor);
             set => _show = value;
         }
 

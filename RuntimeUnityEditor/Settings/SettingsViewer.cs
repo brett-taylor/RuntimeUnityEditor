@@ -1,7 +1,5 @@
 ﻿using RuntimeUnityEditor.Core.Utils;
-using System;
 using System.Globalization;
-using System.IO;
 using UnityEngine;
 
 namespace RuntimeUnityEditor.Core.Settings
@@ -10,6 +8,7 @@ namespace RuntimeUnityEditor.Core.Settings
     {
         private bool _expanded = false;
         private readonly GUILayoutOption _collapseExpandButtonOptions = GUILayout.Width(70);
+        private readonly GUILayoutOption _saveSettingsButtonOptions = GUILayout.Width(120);
         private readonly GUILayoutOption _setTimeBoxOptions = GUILayout.Width(38);
         private readonly GUILayoutOption _saveDNSpyPathOptions = GUILayout.Width(70);
 
@@ -32,6 +31,14 @@ namespace RuntimeUnityEditor.Core.Settings
             {
                 GUILayout.Label("Settings");
 
+                GUILayout.FlexibleSpace();
+
+                if (_expanded)
+                {
+                    if (GUILayout.Button("Save Settings", _saveSettingsButtonOptions))
+                        SettingsManager.Save(RuntimeUnityEditorCore.INSTANCE.SettingsData);
+                }
+
                 var buttonText = _expanded == true ? "Collapse" : "Expand";
                 if (GUILayout.Button(buttonText, _collapseExpandButtonOptions))
                     _expanded = !_expanded;
@@ -53,13 +60,13 @@ namespace RuntimeUnityEditor.Core.Settings
             {
                 GUILayout.BeginHorizontal();
                 {
-                    RuntimeUnityEditorCore.INSTANCE.Settings.EnableClickForParentGameObject = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.Settings.EnableClickForParentGameObject, "Left click for parent game object");
+                    RuntimeUnityEditorCore.INSTANCE.SettingsData.EnableClickForParentGameObject = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.SettingsData.EnableClickForParentGameObject, "Left click for parent game object");
                 }
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 {
-                    RuntimeUnityEditorCore.INSTANCE.Settings.EnableClickForChildGameObject = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.Settings.EnableClickForChildGameObject, "Right click for child game object");
+                    RuntimeUnityEditorCore.INSTANCE.SettingsData.EnableClickForChildGameObject = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.SettingsData.EnableClickForChildGameObject, "Right click for child game object");
                 }
                 GUILayout.EndHorizontal();
             }
@@ -70,8 +77,8 @@ namespace RuntimeUnityEditor.Core.Settings
         {
             GUILayout.BeginVertical(GUI.skin.box);
             {
-                RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmos = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmos, "Show gizmos for selection");
-                RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmosOutsideEditor = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.Settings.ShowGizmosOutsideEditor, "Show gizmos outside editor");
+                RuntimeUnityEditorCore.INSTANCE.SettingsData.ShowGizmos = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.SettingsData.ShowGizmos, "Show gizmos for selection");
+                RuntimeUnityEditorCore.INSTANCE.SettingsData.ShowGizmosOutsideEditor = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.SettingsData.ShowGizmosOutsideEditor, "Show gizmos outside editor");
             }
             GUILayout.EndVertical();
         }
@@ -105,7 +112,7 @@ namespace RuntimeUnityEditor.Core.Settings
 
                 GUILayout.FlexibleSpace();
 
-                RuntimeUnityEditorCore.INSTANCE.Settings.Wireframe = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.Settings.Wireframe, "Wireframe");
+                RuntimeUnityEditorCore.INSTANCE.SettingsData.Wireframe = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.SettingsData.Wireframe, "Wireframe");
             }
             GUILayout.EndHorizontal();
         }
@@ -117,9 +124,9 @@ namespace RuntimeUnityEditor.Core.Settings
                 GUILayout.Label("DNSpy Path");
                 GUILayout.BeginHorizontal();
                 {
-                    RuntimeUnityEditorCore.INSTANCE.Settings.DNSpyPath = GUILayout.TextField(RuntimeUnityEditorCore.INSTANCE.Settings.DNSpyPath);
+                    RuntimeUnityEditorCore.INSTANCE.SettingsData.DNSpyPath = GUILayout.TextField(RuntimeUnityEditorCore.INSTANCE.SettingsData.DNSpyPath);
                     if (GUILayout.Button("Save", _saveDNSpyPathOptions))
-                        DnSpyHelper.DnSpyPath = RuntimeUnityEditorCore.INSTANCE.Settings.DNSpyPath;
+                        DnSpyHelper.DnSpyPath = RuntimeUnityEditorCore.INSTANCE.SettingsData.DNSpyPath;
                 }
                 GUILayout.EndHorizontal();
             }

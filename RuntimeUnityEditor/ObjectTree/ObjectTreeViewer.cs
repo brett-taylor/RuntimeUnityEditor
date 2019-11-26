@@ -76,8 +76,8 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
                 yield return new WaitForEndOfFrame();
 
-                if (GL.wireframe != RuntimeUnityEditorCore.INSTANCE.Settings.Wireframe)
-                    GL.wireframe = RuntimeUnityEditorCore.INSTANCE.Settings.Wireframe;
+                if (GL.wireframe != RuntimeUnityEditorCore.INSTANCE.SettingsData.Wireframe)
+                    GL.wireframe = RuntimeUnityEditorCore.INSTANCE.SettingsData.Wireframe;
 
                 _actuallyInsideOnGui = false;
             }
@@ -202,7 +202,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
         public void DisplayViewer()
         {
-            if (RuntimeUnityEditorCore.INSTANCE.Settings.Wireframe && _actuallyInsideOnGui && Event.current.type == EventType.Layout)
+            if (RuntimeUnityEditorCore.INSTANCE.SettingsData.Wireframe && _actuallyInsideOnGui && Event.current.type == EventType.Layout)
                 GL.wireframe = false;
 
             if (Enabled)
@@ -214,8 +214,8 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
         public void Update()
         {
-            bool isLeftClickDown = RuntimeUnityEditorCore.INSTANCE.Settings.EnableClickForParentGameObject && Input.GetMouseButtonDown(0);
-            bool isRightClickDown = RuntimeUnityEditorCore.INSTANCE.Settings.EnableClickForChildGameObject && Input.GetMouseButtonDown(1);
+            bool isLeftClickDown = RuntimeUnityEditorCore.INSTANCE.SettingsData.EnableClickForParentGameObject && Input.GetMouseButtonDown(0);
+            bool isRightClickDown = RuntimeUnityEditorCore.INSTANCE.SettingsData.EnableClickForChildGameObject && Input.GetMouseButtonDown(1);
 
             if (isLeftClickDown || isRightClickDown)
             {

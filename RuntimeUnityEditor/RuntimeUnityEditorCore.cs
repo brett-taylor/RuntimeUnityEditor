@@ -13,13 +13,13 @@ namespace RuntimeUnityEditor.Core
     public class RuntimeUnityEditorCore : MonoBehaviour
     {
         public static RuntimeUnityEditorCore INSTANCE { get; private set; }
-        internal static KeyCode SHOW_HOT_KEY { get; set; } = KeyCode.F7;
+        internal static KeyCode SHOW_HOT_KEY => KeyCode.F7;
         internal static ILoggerWrapper LOGGER { get; private set; }
 
         public Inspector.Inspector Inspector { get; private set; }
         public ObjectTreeViewer TreeViewer { get; private set; }
         public ReplWindow Repl { get; private set; }
-        public Settings.Settings Settings { get; private set; }
+        public SettingsData SettingsData { get; private set; }
         public SettingsViewer SettingsViewer { get; private set; }
 
         private GizmoDrawer _gizmoDrawer;
@@ -31,9 +31,12 @@ namespace RuntimeUnityEditor.Core
         {
             INSTANCE = this;
             LOGGER = logger;
-            Settings = new Settings.Settings();
-            SettingsViewer = new SettingsViewer();
 
+            SettingsData = SettingsManager.LoadOrCreate();
+            if (string.IsNullOrEmpty(SettingsData.DNSpyPath) == false)
+                DnSpyHelper.DnSpyPath = SettingsData.DNSpyPath;
+
+            SettingsViewer = new SettingsViewer();
             TreeViewer = new ObjectTreeViewer(this, _gameObjectSearcher)
             {
                 InspectorOpenCallback = items =>
