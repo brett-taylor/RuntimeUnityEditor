@@ -22,24 +22,8 @@ namespace RuntimeUnityEditor.Core.Gizmos
 
         public bool Show
         {
-            get => ShowGizmos && (_show || ShowGizmosOutsideEditor);
+            get => RuntimeUnityEditorCore.INSTANCE.SettingsData.ShowGizmos && (_show || RuntimeUnityEditorCore.INSTANCE.SettingsData.ShowGizmosOutsideEditor);
             set => _show = value;
-        }
-
-        public static bool ShowGizmos { get; set; }
-        public static bool ShowGizmosOutsideEditor { get; set; }
-
-        public static void DisplayControls()
-        {
-            if (!UnityFeatureHelper.SupportsVectrosity) return;
-
-            GUILayout.BeginHorizontal(GUI.skin.box);
-            {
-                ShowGizmos = GUILayout.Toggle(ShowGizmos, "Show gizmos for selection");
-                ShowGizmosOutsideEditor = GUILayout.Toggle(ShowGizmosOutsideEditor, "Always show");
-                GUILayout.FlexibleSpace();
-            }
-            GUILayout.EndHorizontal();
         }
 
         public void UpdateState(Transform rootTransform)

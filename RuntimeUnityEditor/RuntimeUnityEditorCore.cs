@@ -3,6 +3,7 @@ using System.IO;
 using RuntimeUnityEditor.Core.Gizmos;
 using RuntimeUnityEditor.Core.ObjectTree;
 using RuntimeUnityEditor.Core.REPL;
+using RuntimeUnityEditor.Core.Settings;
 using RuntimeUnityEditor.Core.UI;
 using RuntimeUnityEditor.Core.Utils;
 using UnityEngine;
@@ -12,12 +13,14 @@ namespace RuntimeUnityEditor.Core
     public class RuntimeUnityEditorCore : MonoBehaviour
     {
         public static RuntimeUnityEditorCore INSTANCE { get; private set; }
-        internal static KeyCode SHOW_HOT_KEY { get; set; } = KeyCode.F7;
+        internal static KeyCode SHOW_HOT_KEY => KeyCode.F7;
         internal static ILoggerWrapper LOGGER { get; private set; }
 
         public Inspector.Inspector Inspector { get; private set; }
         public ObjectTreeViewer TreeViewer { get; private set; }
         public ReplWindow Repl { get; private set; }
+        public SettingsData SettingsData { get; private set; }
+        public SettingsViewer SettingsViewer { get; private set; }
 
         private GizmoDrawer _gizmoDrawer;
         private GameObjectSearcher _gameObjectSearcher = new GameObjectSearcher();
@@ -28,6 +31,11 @@ namespace RuntimeUnityEditor.Core
         {
             INSTANCE = this;
             LOGGER = logger;
+
+            SettingsData = SettingsManager.LoadOrCreate();
+            DnSpyHelper.SetPath(SettingsData.DNSpyPath, false);
+
+            SettingsViewer = new SettingsViewer();
             TreeViewer = new ObjectTreeViewer(this, _gameObjectSearcher)
             {
                 InspectorOpenCallback = items =>
@@ -38,11 +46,8 @@ namespace RuntimeUnityEditor.Core
                 }
             };
 
-            if (UnityFeatureHelper.SupportsVectrosity)
-            {
-                _gizmoDrawer = new GizmoDrawer(this);
-                TreeViewer.TreeSelectionChangedCallback = transform => _gizmoDrawer.UpdateState(transform);
-            }
+            _gizmoDrawer = new GizmoDrawer(this);
+            TreeViewer.TreeSelectionChangedCallback = transform => _gizmoDrawer.UpdateState(transform);
 
             if (UnityFeatureHelper.SupportsCursorIndex &&
                 UnityFeatureHelper.SupportsXml)

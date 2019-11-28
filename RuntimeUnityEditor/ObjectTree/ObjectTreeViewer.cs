@@ -6,6 +6,7 @@ using System.Linq;
 using RuntimeUnityEditor.Core.Gizmos;
 using RuntimeUnityEditor.Core.Inspector;
 using RuntimeUnityEditor.Core.Inspector.Entries;
+using RuntimeUnityEditor.Core.Settings;
 using RuntimeUnityEditor.Core.UI;
 using RuntimeUnityEditor.Core.Utils;
 using UnityEngine;
@@ -37,6 +38,16 @@ namespace RuntimeUnityEditor.Core.ObjectTree
         private readonly GUILayoutOption _drawVector3SliderHeight = GUILayout.Height(10);
         private readonly GUILayoutOption _drawVector3SliderWidth = GUILayout.Width(33);
         private readonly int _windowId;
+        private bool _actuallyInsideOnGui;
+
+        public ObjectTreeViewer(MonoBehaviour pluginObject, GameObjectSearcher gameObjectSearcher)
+        {
+            if (pluginObject == null) throw new ArgumentNullException(nameof(pluginObject));
+            _gameObjectSearcher = gameObjectSearcher ?? throw new ArgumentNullException(nameof(gameObjectSearcher));
+            _windowId = GetHashCode();
+
+            pluginObject.StartCoroutine(SetWireframeCo());
+        }
 
         public void SelectAndShowObject(Transform target)
         {
@@ -55,20 +66,6 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             Enabled = true;
         }
 
-        public ObjectTreeViewer(MonoBehaviour pluginObject, GameObjectSearcher gameObjectSearcher)
-        {
-            if (pluginObject == null) throw new ArgumentNullException(nameof(pluginObject));
-            if (gameObjectSearcher == null) throw new ArgumentNullException(nameof(gameObjectSearcher));
-
-            _gameObjectSearcher = gameObjectSearcher;
-            _windowId = GetHashCode();
-
-            pluginObject.StartCoroutine(SetWireframeCo());
-        }
-
-        private bool _wireframe;
-        private bool _actuallyInsideOnGui;
-
         private IEnumerator SetWireframeCo()
         {
             while (true)
@@ -79,8 +76,8 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
                 yield return new WaitForEndOfFrame();
 
-                if (GL.wireframe != _wireframe)
-                    GL.wireframe = _wireframe;
+                if (GL.wireframe != RuntimeUnityEditorCore.INSTANCE.SettingsData.Wireframe)
+                    GL.wireframe = RuntimeUnityEditorCore.INSTANCE.SettingsData.Wireframe;
 
                 _actuallyInsideOnGui = false;
             }
@@ -205,7 +202,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
         public void DisplayViewer()
         {
-            if (_wireframe && _actuallyInsideOnGui && Event.current.type == EventType.Layout)
+            if (RuntimeUnityEditorCore.INSTANCE.SettingsData.Wireframe && _actuallyInsideOnGui && Event.current.type == EventType.Layout)
                 GL.wireframe = false;
 
             if (Enabled)
@@ -217,15 +214,18 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
         public void Update()
         {
-            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
+            bool isLeftClickDown = RuntimeUnityEditorCore.INSTANCE.SettingsData.EnableClickForParentGameObject && Input.GetMouseButtonDown(0);
+            bool isRightClickDown = RuntimeUnityEditorCore.INSTANCE.SettingsData.EnableClickForChildGameObject && Input.GetMouseButtonDown(1);
+
+            if (isLeftClickDown || isRightClickDown)
             {
                 Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, _clickMask);
 
-                if (Input.GetMouseButtonDown(0))
+                if (isLeftClickDown)
                 {
                     SelectAndShowObject(hit.transform);
                 }
-                else if (Input.GetMouseButtonDown(1))
+                else if (isRightClickDown)
                 {
                     SelectAndShowObject(hit.collider.transform);
                 }
@@ -241,6 +241,8 @@ namespace RuntimeUnityEditor.Core.ObjectTree
                 DisplayControls();
 
                 DisplayObjectProperties();
+
+                RuntimeUnityEditorCore.INSTANCE.SettingsViewer.DrawSettingsMenu();
             }
             GUILayout.EndHorizontal();
 
@@ -249,37 +251,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
         private void DisplayControls()
         {
-            GUILayout.BeginHorizontal(GUI.skin.box);
-            {
-                if (SelectedTransform == null) GUI.enabled = false;
-                if (GUILayout.Button("Dump", GUILayout.ExpandWidth(false)))
-                    SceneDumper.DumpObjects(SelectedTransform?.gameObject);
-                GUI.enabled = true;
-
-                if (GUILayout.Button("Log", GUILayout.ExpandWidth(false)))
-                    UnityFeatureHelper.OpenLog();
-
-                GUILayout.FlexibleSpace();
-
-                GUILayout.Label("Time", GUILayout.ExpandWidth(false));
-
-                if (GUILayout.Button(">", GUILayout.ExpandWidth(false)))
-                    Time.timeScale = 1;
-                if (GUILayout.Button("||", GUILayout.ExpandWidth(false)))
-                    Time.timeScale = 0;
-
-                if (float.TryParse(GUILayout.TextField(Time.timeScale.ToString("F2", CultureInfo.InvariantCulture), _drawVector3FieldWidth), NumberStyles.Any, CultureInfo.InvariantCulture, out var newVal))
-                    Time.timeScale = newVal;
-
-                GUILayout.FlexibleSpace();
-
-                _wireframe = GUILayout.Toggle(_wireframe, "Wireframe");
-            }
-            GUILayout.EndHorizontal();
-
             AssetBundleManagerHelper.DrawButtonIfAvailable();
-
-            GizmoDrawer.DisplayControls();
         }
 
         private void DisplayObjectProperties()
