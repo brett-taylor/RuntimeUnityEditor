@@ -28,7 +28,6 @@ namespace RuntimeUnityEditor.Core.ObjectTree
         private Rect _windowRect;
         private float _objectTreeHeight;
         private int _singleObjectTreeItemHeight;
-        private bool _scrollTreeToSelected;
         private bool _enabled;
         private readonly LayerMask _clickMask = ~(1 << LayerMask.NameToLayer("layer19"));
         private readonly GameObjectSearcher _gameObjectSearcher;
@@ -39,6 +38,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
         private readonly GUILayoutOption _drawVector3SliderWidth = GUILayout.Width(33);
         private readonly int _windowId;
         private bool _actuallyInsideOnGui;
+        private bool _wasObjectJustSelected = false;
 
         public ObjectTreeViewer(MonoBehaviour pluginObject, GameObjectSearcher gameObjectSearcher)
         {
@@ -62,7 +62,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
                 target = target.parent;
             }
 
-            _scrollTreeToSelected = true;
+            _wasObjectJustSelected = true;
             Enabled = true;
         }
 
@@ -121,31 +121,29 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             _objectTreeHeight = _windowRect.height / 3;
         }
 
+        private int AmountOfObjectsShownInTree()
+        {
+            return (int) _objectTreeHeight / _singleObjectTreeItemHeight;
+        }
+
         private void DisplayObjectTreeHelper(GameObject go, int indent, ref int currentCount)
         {
             currentCount++;
+            if (_wasObjectJustSelected && SelectedTransform == go.transform)
+            {
+                _treeScrollPosition.y = (currentCount * _singleObjectTreeItemHeight) - (AmountOfObjectsShownInTree() / 2 * _singleObjectTreeItemHeight);
+                _wasObjectJustSelected = false;
+            }
 
             var needsHeightMeasure = _singleObjectTreeItemHeight == 0;
-
-            var isVisible = currentCount * _singleObjectTreeItemHeight >= _treeScrollPosition.y &&
-                            (currentCount - 1) * _singleObjectTreeItemHeight <= _treeScrollPosition.y + _objectTreeHeight;
-
+            var isVisible = currentCount * _singleObjectTreeItemHeight >= _treeScrollPosition.y && (currentCount - 1) * _singleObjectTreeItemHeight <= _treeScrollPosition.y + _objectTreeHeight;
             if (needsHeightMeasure || isVisible)
             {
                 var c = GUI.color;
                 if (SelectedTransform == go.transform)
-                {
                     GUI.color = Color.cyan;
-                    if (_scrollTreeToSelected && Event.current.type == EventType.Repaint)
-                    {
-                        _scrollTreeToSelected = false;
-                        _treeScrollPosition.y = GUILayoutUtility.GetLastRect().y - 50;
-                    }
-                }
                 else if (!go.activeSelf)
-                {
                     GUI.color = new Color(1, 1, 1, 0.6f);
-                }
 
                 GUILayout.BeginHorizontal();
                 {
@@ -493,8 +491,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             {
                 DisplayTreeSearchBox();
 
-                _treeScrollPosition = GUILayout.BeginScrollView(_treeScrollPosition,
-                    GUILayout.Height(_objectTreeHeight), GUILayout.ExpandWidth(true));
+                _treeScrollPosition = GUILayout.BeginScrollView(_treeScrollPosition, GUILayout.Height(_objectTreeHeight), GUILayout.ExpandWidth(true));
                 {
                     var currentCount = 0;
                     foreach (var rootGameObject in _gameObjectSearcher.GetSearchedOrAllObjects())
