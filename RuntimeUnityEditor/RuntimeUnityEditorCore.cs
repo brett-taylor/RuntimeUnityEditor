@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using RuntimeUnityEditor.Core.Gizmos;
 using RuntimeUnityEditor.Core.ObjectTree;
+using RuntimeUnityEditor.Core.PinnedVariables;
 using RuntimeUnityEditor.Core.REPL;
 using RuntimeUnityEditor.Core.Settings;
 using RuntimeUnityEditor.Core.UI;
@@ -23,6 +24,7 @@ namespace RuntimeUnityEditor.Core
         public ReplWindow Repl { get; private set; }
         public SettingsData SettingsData { get; private set; }
         public SettingsViewer SettingsViewer { get; private set; }
+        public PinnedVariablesViewer PinnedVariablesViewer { get; private set; }
 
         private GizmoDrawer _gizmoDrawer;
         private GameObjectSearcher _gameObjectSearcher = new GameObjectSearcher();
@@ -72,6 +74,9 @@ namespace RuntimeUnityEditor.Core
 
             Inspector = new Inspector.Inspector(targetTransform => TreeViewer.SelectAndShowObject(targetTransform), Repl);
             windows.Add(Inspector);
+
+            PinnedVariablesViewer = new PinnedVariablesViewer();
+            windows.Add(PinnedVariablesViewer);
         }
 
         internal void OnGUI()
