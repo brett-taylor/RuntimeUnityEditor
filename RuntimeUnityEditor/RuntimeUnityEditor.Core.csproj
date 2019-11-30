@@ -77,7 +77,7 @@
     <Compile Include="Settings\SettingsViewer.cs" />
     <Compile Include="Utils\AssetBundleManagerHelper.cs" />
     <Compile Include="ObjectTree\GameObjectSearcher.cs" />
-    <Compile Include="Gizmos\IGizmoEntry.cs" />
+    <Compile Include="Gizmos\LineStore.cs" />
     <Compile Include="Gizmos\RendererGizmo.cs" />
     <Compile Include="ILoggerWrapper.cs" />
     <Compile Include="Inspector\Entries\Contents\CallbackCacheEntey.cs" />
@@ -88,7 +88,7 @@
     <Compile Include="Inspector\Entries\Contents\CacheEntryBase.cs" />
     <Compile Include="Inspector\InspectorHelpObject.cs" />
     <Compile Include="LogLevel.cs" />
-    <Compile Include="Gizmos\GizmoDrawer.cs" />
+    <Compile Include="Gizmos\LineRender.cs" />
     <Compile Include="ObjectTree\ObjectTreeViewer.cs" />
     <Compile Include="REPL\MCS\ScriptEvaluator.cs" />
     <Compile Include="REPL\REPL.cs" />

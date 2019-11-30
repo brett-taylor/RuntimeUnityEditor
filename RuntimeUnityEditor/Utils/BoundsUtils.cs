@@ -29,7 +29,7 @@ namespace RuntimeUnityEditor.Core.Utils
         public GameObject obj;
         public BoxCollider collider;
         public override List<Line> lines =>
-            BoundUtils.VectorToBox(obj.transform.position,
+            BoundUtils.VectorToBox(obj.transform.position + collider.center,
                                    Vector3.Scale(collider.size, obj.transform.localScale) / 2);
     }
     

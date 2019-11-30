@@ -38,7 +38,7 @@ namespace RuntimeUnityEditor.Core.Gizmos
 
         public static void AddBox(GameObject objWithBoxCollider)
         {
-            foreach (BoxCollider collider in objWithBoxCollider.GetComponents<BoxCollider>()) {
+            foreach (var collider in objWithBoxCollider.GetComponents<BoxCollider>()) {
                 var box = new BoxWrapper();
                 box.color = Color.green;
                 box.obj = objWithBoxCollider;
