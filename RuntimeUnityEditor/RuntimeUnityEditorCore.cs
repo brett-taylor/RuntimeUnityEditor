@@ -29,11 +29,13 @@ namespace RuntimeUnityEditor.Core
         private CursorLockMode _previousCursorLockState;
         private bool _previousCursorVisible;
         private readonly List<IWindow> windows = new List<IWindow>();
+        private Action<bool> _showOrHideCursor;
 
-        public void Setup(ILoggerWrapper logger, string configPath)
+        public void Setup(ILoggerWrapper logger, Action<bool> ShowOrHideCursor)
         {
             INSTANCE = this;
             LOGGER = logger;
+            _showOrHideCursor = ShowOrHideCursor;
 
             SettingsData = SettingsManager.LoadOrCreate();
             DnSpyHelper.SetPath(SettingsData.DNSpyPath, false);
@@ -57,7 +59,7 @@ namespace RuntimeUnityEditor.Core
             {
                 try
                 {
-                    Repl = new ReplWindow(Path.Combine(configPath, "RuntimeUnityEditor.Autostart.cs"));
+                    Repl = new ReplWindow("RuntimeUnityEditor.Autostart.cs");
                     Repl.RunAutostart();
                 }
                 catch (Exception ex)
@@ -73,7 +75,6 @@ namespace RuntimeUnityEditor.Core
         {
             var originalSkin = GUI.skin;
             GUI.skin = InterfaceMaker.CustomSkin;
-            ShowCursorIfVisible();
 
             foreach (IWindow window in windows)
             {
@@ -145,11 +146,6 @@ namespace RuntimeUnityEditor.Core
             }
         }
 
-        private void LateUpdate()
-        {
-            ShowCursorIfVisible();
-        }
-
         private void RefreshGameObjectSearcher(bool full)
         {
             bool GizmoFilter(GameObject o) => o.name.StartsWith(GizmoDrawer.GizmoObjectName);
@@ -173,11 +169,7 @@ namespace RuntimeUnityEditor.Core
 
         private void ShowCursorIfVisible()
         {
-            if (Show)
-            {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-            }
+            _showOrHideCursor(Show);
         }
     }
 }

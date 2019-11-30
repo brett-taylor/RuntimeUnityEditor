@@ -100,7 +100,7 @@ namespace RuntimeUnityEditor.Core
                         if (shouldLog)
                         {
                             string message = "[DnSpyHelper] dnSpy path set";
-                            ErrorMessage.AddMessage(message);
+                            RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Error, message);
                             RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Message, message);
                         }
                     }
@@ -109,7 +109,7 @@ namespace RuntimeUnityEditor.Core
                         if (shouldLog)
                         {
                             string message = "[DnSpyHelper] Invalid dnSpy path. The path has to point to 64bit dnSpy.exe";
-                            ErrorMessage.AddMessage(message);
+                            RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Error, message);
                             RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Error | LogLevel.Message, message);
                         }
                     }
