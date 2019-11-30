@@ -28,8 +28,9 @@ namespace RuntimeUnityEditor.Core
         private GameObjectSearcher _gameObjectSearcher = new GameObjectSearcher();
         private CursorLockMode _previousCursorLockState;
         private bool _previousCursorVisible;
-        private readonly List<IWindow> windows = new List<IWindow>();
+        private readonly List<Window> windows = new List<Window>();
         private Action<bool> _showOrHideCursor;
+        private bool _show;
 
         public void Setup(ILoggerWrapper logger, Action<bool> ShowOrHideCursor)
         {
@@ -76,7 +77,7 @@ namespace RuntimeUnityEditor.Core
             var originalSkin = GUI.skin;
             GUI.skin = InterfaceMaker.CustomSkin;
 
-            foreach (IWindow window in windows)
+            foreach (Window window in windows)
             {
                 if (IsInCorrectState(window.RenderOnlyInWindowState))
                     window.RenderWindow();
@@ -87,7 +88,7 @@ namespace RuntimeUnityEditor.Core
 
         public bool Show
         {
-            get => TreeViewer.Enabled;
+            get => _show;
             set
             {
                 if (Show != value)
@@ -107,8 +108,6 @@ namespace RuntimeUnityEditor.Core
                     }
                 }
 
-                TreeViewer.Enabled = value;
-
                 if (_gizmoDrawer != null)
                 {
                     _gizmoDrawer.Show = value;
@@ -119,6 +118,8 @@ namespace RuntimeUnityEditor.Core
                 {
                     RefreshGameObjectSearcher(true);
                 }
+
+                _show = value;
             }
         }
 
@@ -136,7 +137,7 @@ namespace RuntimeUnityEditor.Core
                 Screen.height - SCREEN_OFFSET * 2
             );
 
-            foreach (IWindow window in windows)
+            foreach (Window window in windows)
             {
                 if (IsInCorrectState(window.RenderOnlyInWindowState))
                     window.UpdateWindowSize(screenRect);

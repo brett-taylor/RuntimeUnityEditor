@@ -14,7 +14,7 @@ using Object = UnityEngine.Object;
 
 namespace RuntimeUnityEditor.Core.ObjectTree
 {
-    public class ObjectTreeViewer : IWindow
+    public class ObjectTreeViewer : Window
     {
         internal Action<InspectorStackEntryBase[]> InspectorOpenCallback;
         internal Action<Transform> TreeSelectionChangedCallback;
@@ -23,10 +23,8 @@ namespace RuntimeUnityEditor.Core.ObjectTree
         private Vector2 _propertiesScrollPosition;
         private Transform _selectedTransform;
         private Vector2 _treeScrollPosition;
-        private Rect _windowRect;
         private float _objectTreeHeight;
         private int _singleObjectTreeItemHeight;
-        private bool _enabled;
         private readonly LayerMask _clickMask = ~(1 << LayerMask.NameToLayer("layer19"));
         private readonly GameObjectSearcher _gameObjectSearcher;
         private readonly Dictionary<Image, Texture2D> _imagePreviewCache = new Dictionary<Image, Texture2D>();
@@ -34,7 +32,6 @@ namespace RuntimeUnityEditor.Core.ObjectTree
         private readonly GUILayoutOption _drawVector3FieldHeight = GUILayout.Height(19);
         private readonly GUILayoutOption _drawVector3SliderHeight = GUILayout.Height(10);
         private readonly GUILayoutOption _drawVector3SliderWidth = GUILayout.Width(33);
-        private readonly int _windowId;
         private bool _actuallyInsideOnGui;
         private bool _wasObjectJustSelected = false;
 
@@ -42,7 +39,6 @@ namespace RuntimeUnityEditor.Core.ObjectTree
         {
             if (pluginObject == null) throw new ArgumentNullException(nameof(pluginObject));
             _gameObjectSearcher = gameObjectSearcher ?? throw new ArgumentNullException(nameof(gameObjectSearcher));
-            _windowId = GetHashCode();
 
             pluginObject.StartCoroutine(SetWireframeCo());
         }
@@ -61,7 +57,6 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             }
 
             _wasObjectJustSelected = true;
-            Enabled = true;
         }
 
         private IEnumerator SetWireframeCo()
@@ -81,18 +76,6 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             }
         }
 
-        public bool Enabled
-        {
-            get => _enabled;
-            set
-            {
-                if (value && !_enabled)
-                    ClearCaches();
-
-                _enabled = value;
-            }
-        }
-
         public Transform SelectedTransform
         {
             get { return _selectedTransform; }
@@ -103,23 +86,24 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             }
         }
 
-        public WindowState RenderOnlyInWindowState => WindowState.ALL;
+        internal override WindowState RenderOnlyInWindowState => WindowState.VISIBLE;
 
-        public WindowState UpdateOnlyInWindowState => WindowState.ALL;
+        internal override WindowState UpdateOnlyInWindowState => WindowState.VISIBLE;
 
-        public void ClearCaches()
-        {
-            _imagePreviewCache.Clear();
-        }
+        protected override bool ShouldEatInput => true;
+
+        protected override bool IsWindowDraggable => true;
+
+        protected override string WindowTitle => "Scene Object Browser";
 
         private void OnInspectorOpen(params InspectorStackEntryBase[] items)
         {
             InspectorOpenCallback.Invoke(items);
         }
 
-        public void UpdateWindowSize(Rect screenSize)
+        protected override Rect GetStartingRect(Rect screenSize)
         {
-            _windowRect = new Rect(
+            Rect _windowRect = new Rect(
                 screenSize.xMax - 350,
                 screenSize.yMin,
                 350,
@@ -127,6 +111,8 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             );
 
             _objectTreeHeight = _windowRect.height / 3;
+
+            return _windowRect;
         }
 
         private int AmountOfObjectsShownInTree()
@@ -206,19 +192,13 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             }
         }
 
-        public void RenderWindow()
+        protected override void PostCreatedWindow()
         {
             if (RuntimeUnityEditorCore.INSTANCE.SettingsData.Wireframe && _actuallyInsideOnGui && Event.current.type == EventType.Layout)
                 GL.wireframe = false;
-
-            if (Enabled)
-            {
-                _windowRect = GUILayout.Window(_windowId, _windowRect, WindowFunc, "Scene Object Browser");
-                InterfaceMaker.EatInputInRect(_windowRect);
-            }
         }
 
-        public void Update()
+        internal override void Update()
         {
             bool isLeftClickDown = RuntimeUnityEditorCore.INSTANCE.SettingsData.EnableClickForParentGameObject && Input.GetMouseButtonDown(0);
             bool isRightClickDown = RuntimeUnityEditorCore.INSTANCE.SettingsData.EnableClickForChildGameObject && Input.GetMouseButtonDown(1);
@@ -238,19 +218,13 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             }
         }
 
-        private void WindowFunc(int id)
+        protected override void DrawWindowContents()
         {
-            GUILayout.BeginVertical();
-            {
-                DisplayObjectTree();
+            DisplayObjectTree();
 
-                DisplayObjectProperties();
+            DisplayObjectProperties();
 
-                RuntimeUnityEditorCore.INSTANCE.SettingsViewer.DrawSettingsMenu();
-            }
-            GUILayout.EndHorizontal();
-
-            GUI.DragWindow();
+            RuntimeUnityEditorCore.INSTANCE.SettingsViewer.DrawSettingsMenu();
         }
 
         private void DisplayObjectProperties()
