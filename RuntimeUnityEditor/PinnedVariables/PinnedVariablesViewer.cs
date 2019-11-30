@@ -6,10 +6,10 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
 {
     public class PinnedVariablesViewer : Window
     {
-        protected override bool ShouldEatInput => true;
+        protected override bool ShouldEatInput => ShouldBeVisible();
         protected override bool IsWindowDraggable => true;
         protected override string WindowTitle => "Pinned Variables";
-        internal override WindowState RenderOnlyInWindowState => WindowState.ALL;
+        internal override WindowState RenderOnlyInWindowState => WindowState.CONDITIONAL;
         internal override WindowState UpdateOnlyInWindowState => WindowState.ALL;
 
         protected override bool PreCreatedWindow()
@@ -23,7 +23,7 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
 
         internal override Rect GetStartingRect(Rect screenSize, float centerWidth, float centerX)
         {
-            return new Rect(RuntimeUnityEditorCore.SCREEN_OFFSET, RuntimeUnityEditorCore.SCREEN_OFFSET, 300f, 50f);
+            return new Rect(RuntimeUnityEditorCore.SCREEN_OFFSET, RuntimeUnityEditorCore.SCREEN_OFFSET, 400f, 50f);
         }
 
         protected override void DrawWindowContents()
@@ -33,6 +33,11 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
 
         internal override void Update()
         {
+        }
+
+        internal override bool ShouldBeVisible()
+        {
+            return RuntimeUnityEditorCore.INSTANCE.Show;
         }
     }
 }
