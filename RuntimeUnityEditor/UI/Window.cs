@@ -63,5 +63,15 @@ namespace RuntimeUnityEditor.Core.UI
                 _hasRectBeenSet = true;
             }
         }
+
+        internal virtual bool ShouldBeVisible()
+        {
+            return true;
+        }
+
+        internal virtual bool ShouldUpdate()
+        {
+            return true;
+        }
     }
 }
