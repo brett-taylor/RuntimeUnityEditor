@@ -24,6 +24,7 @@ namespace RuntimeUnityEditor.Core
         public ReplWindow Repl { get; private set; }
         public SettingsData SettingsData { get; private set; }
         public SettingsViewer SettingsViewer { get; private set; }
+        public PinnedVariablesData PinnedVariablesData { get; private set; }
         public PinnedVariablesViewer PinnedVariablesViewer { get; private set; }
 
         private GizmoDrawer _gizmoDrawer;
@@ -75,7 +76,8 @@ namespace RuntimeUnityEditor.Core
             Inspector = new Inspector.Inspector(targetTransform => TreeViewer.SelectAndShowObject(targetTransform), Repl);
             windows.Add(Inspector);
 
-            PinnedVariablesViewer = new PinnedVariablesViewer();
+            PinnedVariablesData = new PinnedVariablesData();
+            PinnedVariablesViewer = new PinnedVariablesViewer(PinnedVariablesData);
             windows.Add(PinnedVariablesViewer);
         }
 

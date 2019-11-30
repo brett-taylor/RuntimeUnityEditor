@@ -23,6 +23,7 @@ namespace RuntimeUnityEditor.Core.Inspector
         private readonly GUILayoutOption _inspectorRecordHeight = GUILayout.Height(InspectorRecordHeight);
         private readonly GUILayoutOption _dnSpyButtonOptions = GUILayout.Width(50);
         private readonly GUILayoutOption _createREPLVariableWidth = GUILayout.Width(80);
+        private readonly GUILayoutOption _pinButtonOptions = GUILayout.Width(50);
 
         private GUIStyle _alignedButtonStyle;
 
@@ -401,6 +402,17 @@ namespace RuntimeUnityEditor.Core.Inspector
 
                 if (DnSpyHelper.IsAvailable && GUILayout.Button("DNSpy", _dnSpyButtonOptions))
                     DnSpyHelper.OpenInDnSpy(entry);
+
+                if (RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.IsTracked(entry.TypeName(), entry))
+                {
+                    if (DnSpyHelper.IsAvailable && GUILayout.Button("Unpin", _pinButtonOptions))
+                        RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.Untrack(entry.TypeName(), entry);
+                }
+                else
+                {
+                    if (DnSpyHelper.IsAvailable && GUILayout.Button("Pin", _pinButtonOptions))
+                        RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.Track(entry.TypeName(), entry);
+                }
             }
             GUILayout.EndHorizontal();
         }
