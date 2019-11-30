@@ -62,6 +62,7 @@ namespace RuntimeUnityEditor.Core
                 {
                     Repl = new ReplWindow("RuntimeUnityEditor.Autostart.cs");
                     Repl.RunAutostart();
+                    windows.Add(Repl);
                 }
                 catch (Exception ex)
                 {
@@ -70,6 +71,7 @@ namespace RuntimeUnityEditor.Core
             }
 
             Inspector = new Inspector.Inspector(targetTransform => TreeViewer.SelectAndShowObject(targetTransform), Repl);
+            windows.Add(Inspector);
         }
 
         internal void OnGUI()

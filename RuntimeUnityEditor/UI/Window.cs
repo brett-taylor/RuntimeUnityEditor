@@ -5,7 +5,7 @@ namespace RuntimeUnityEditor.Core.UI
     public abstract class Window
     {
         protected Rect _windowRect;
-        private readonly int _windowID;
+        protected readonly int _windowID;
         private bool _hasRectBeenSet = false;
 
         internal abstract WindowState RenderOnlyInWindowState { get; }
@@ -15,9 +15,10 @@ namespace RuntimeUnityEditor.Core.UI
         protected abstract string WindowTitle { get; }
 
         internal abstract void Update();
+        protected abstract bool PreCreatedWindow();
         protected abstract void PostCreatedWindow();
         protected abstract void DrawWindowContents();
-        protected abstract Rect GetStartingRect(Rect screenSize);
+        internal abstract Rect GetStartingRect(Rect screenSize, float centerWidth, float centerX);
 
         public Window()
         {
@@ -26,11 +27,14 @@ namespace RuntimeUnityEditor.Core.UI
 
         internal void RenderWindow()
         {
-            _windowRect = GUILayout.Window(_windowID, _windowRect, WindowFunc, WindowTitle);
-
-            if (ShouldEatInput)
+            if (PreCreatedWindow())
             {
-                InterfaceMaker.EatInputInRect(_windowRect);
+                _windowRect = GUILayout.Window(_windowID, _windowRect, WindowFunc, WindowTitle);
+
+                if (ShouldEatInput)
+                {
+                    InterfaceMaker.EatInputInRect(_windowRect);
+                }
             }
 
             PostCreatedWindow();
@@ -52,7 +56,10 @@ namespace RuntimeUnityEditor.Core.UI
         {
             if (_hasRectBeenSet == false)
             {
-                _windowRect = GetStartingRect(screenSize);
+                var centerWidth = (int) Mathf.Min(850, screenSize.width);
+                var centerX = (int) (screenSize.xMin + screenSize.width / 2 - Mathf.RoundToInt((float) centerWidth / 2));
+
+                _windowRect = GetStartingRect(screenSize, centerWidth, centerX);
                 _hasRectBeenSet = true;
             }
         }

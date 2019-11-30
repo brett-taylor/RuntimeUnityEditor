@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace RuntimeUnityEditor.Core.REPL
 {
-    public sealed class ReplWindow
+    public sealed class ReplWindow : Window
     {
         private static readonly char[] _inputSplitChars = { ',', ';', '<', '>', '(', ')', '[', ']', '=', '|', '&' };
 
@@ -30,7 +30,6 @@ namespace RuntimeUnityEditor.Core.REPL
         private Vector2 _scrollPosition = Vector2.zero;
 
         private readonly int _windowId;
-        private Rect _windowRect;
         private TextEditor _textEditor;
         private int _newCursorLocation = -1;
 
@@ -51,6 +50,16 @@ namespace RuntimeUnityEditor.Core.REPL
                 return _namespaces;
             }
         }
+
+        internal override WindowState RenderOnlyInWindowState => WindowState.VISIBLE;
+
+        internal override WindowState UpdateOnlyInWindowState => WindowState.VISIBLE;
+
+        protected override bool ShouldEatInput => true;
+
+        protected override bool IsWindowDraggable => true;
+
+        protected override string WindowTitle => "C# REPL Console";
 
         private readonly List<Suggestion> _suggestions = new List<Suggestion>();
 
@@ -95,113 +104,10 @@ namespace RuntimeUnityEditor.Core.REPL
             }
         }
 
-        public void DisplayWindow()
-        {
-            if (_completionsListingStyle == null)
-            {
-                _completionsListingStyle = new GUIStyle(GUI.skin.button)
-                {
-                    border = new RectOffset(0, 0, 0, 0),
-                    margin = new RectOffset(0, 0, 0, 0),
-                    padding = new RectOffset(0, 0, 0, 0),
-                    hover = { background = Texture2D.whiteTexture, textColor = Color.black },
-                    normal = { background = null },
-                    focused = { background = Texture2D.whiteTexture, textColor = Color.black },
-                    active = { background = Texture2D.whiteTexture, textColor = Color.black }
-                };
-            }
-
-            _windowRect = GUILayout.Window(_windowId, _windowRect, WindowFunc, "C# REPL Console");
-            InterfaceMaker.EatInputInRect(_windowRect);
-        }
-
         private GUIStyle _completionsListingStyle;
         private bool _refocus;
         private int _refocusCursorIndex = -1;
         private int _refocusSelectIndex;
-
-        private void WindowFunc(int id)
-        {
-            GUILayout.BeginVertical();
-            {
-                _scrollPosition = GUILayout.BeginScrollView(_scrollPosition, false, true, GUIStyle.none, GUI.skin.verticalScrollbar, GUI.skin.textArea);
-                {
-                    GUILayout.FlexibleSpace();
-
-                    if (_suggestions.Count > 0)
-                    {
-                        foreach (var suggestion in _suggestions)
-                        {
-                            _completionsListingStyle.normal.textColor = suggestion.GetTextColor();
-                            if (!GUILayout.Button(suggestion.Full, _completionsListingStyle, GUILayout.ExpandWidth(true)))
-                                continue;
-                            AcceptSuggestion(suggestion.Addition);
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        GUILayout.TextArea(_sb.ToString(), GUI.skin.label);
-                    }
-                }
-                GUILayout.EndScrollView();
-
-                GUILayout.BeginHorizontal();
-                {
-                    GUI.SetNextControlName("replInput");
-                    InputField = GUILayout.TextArea(InputField);
-
-                    if (_refocus)
-                    {
-                        _refocusCursorIndex = _textEditor.cursorIndex;
-                        _refocusSelectIndex = _textEditor.selectIndex;
-                        GUI.FocusControl("replInput");
-                        _refocus = false;
-                    }
-                    else if (_refocusCursorIndex >= 0)
-                    {
-                        _textEditor.cursorIndex = _refocusCursorIndex;
-                        _textEditor.selectIndex = _refocusSelectIndex;
-                        _refocusCursorIndex = -1;
-                    }
-
-                    if (GUILayout.Button("Run", GUILayout.ExpandWidth(false)))
-                        AcceptInput();
-
-                    if (GUILayout.Button("History", GUILayout.ExpandWidth(false)))
-                    {
-                        _sb.AppendLine();
-                        _sb.AppendLine("# History of reed commands:");
-                        foreach (var h in _history)
-                            _sb.AppendLine(h);
-
-                        ScrollToBottom();
-                    }
-
-                    if (GUILayout.Button("Autostart", GUILayout.ExpandWidth(false)))
-                    {
-                        _sb.AppendLine("Opening autostart file at " + _autostartFilename);
-
-                        if (!File.Exists(_autostartFilename))
-                            File.WriteAllText(_autostartFilename, "// This C# code will be executed by the REPL near the end of plugin initialization. Only single-line statements are supported. Use echo(string) to write to REPL log and message(string) to write to global log.\n\n");
-
-                        try { Process.Start(_autostartFilename); }
-                        catch (Exception e) { _sb.AppendLine(e.Message); }
-
-                        ScrollToBottom();
-                    }
-
-                    if (GUILayout.Button("Clear log", GUILayout.ExpandWidth(false)))
-                        _sb.Length = 0;
-                }
-                GUILayout.EndHorizontal();
-            }
-            GUILayout.EndVertical();
-
-            CheckReplInput();
-
-            GUI.DragWindow();
-        }
 
         private void AcceptSuggestion(string suggestion)
         {
@@ -399,14 +305,130 @@ namespace RuntimeUnityEditor.Core.REPL
             private VoidType() { }
         }
 
-        public void UpdateWindowSize(Rect windowRect)
-        {
-            _windowRect = windowRect;
-        }
-
         internal void AppendLogLine(string message)
         {
             _sb.AppendLine(message);
+        }
+
+        internal override void Update()
+        {
+        }
+
+        protected override bool PreCreatedWindow()
+        {
+            if (_completionsListingStyle == null)
+            {
+                _completionsListingStyle = new GUIStyle(GUI.skin.button)
+                {
+                    border = new RectOffset(0, 0, 0, 0),
+                    margin = new RectOffset(0, 0, 0, 0),
+                    padding = new RectOffset(0, 0, 0, 0),
+                    hover = { background = Texture2D.whiteTexture, textColor = Color.black },
+                    normal = { background = null },
+                    focused = { background = Texture2D.whiteTexture, textColor = Color.black },
+                    active = { background = Texture2D.whiteTexture, textColor = Color.black }
+                };
+            }
+
+            return true;
+        }
+
+        protected override void PostCreatedWindow()
+        {
+        }
+
+        protected override void DrawWindowContents()
+        {
+            GUILayout.BeginVertical();
+            {
+                _scrollPosition = GUILayout.BeginScrollView(_scrollPosition, false, true, GUIStyle.none, GUI.skin.verticalScrollbar, GUI.skin.textArea);
+                {
+                    GUILayout.FlexibleSpace();
+
+                    if (_suggestions.Count > 0)
+                    {
+                        foreach (var suggestion in _suggestions)
+                        {
+                            _completionsListingStyle.normal.textColor = suggestion.GetTextColor();
+                            if (!GUILayout.Button(suggestion.Full, _completionsListingStyle, GUILayout.ExpandWidth(true)))
+                                continue;
+                            AcceptSuggestion(suggestion.Addition);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        GUILayout.TextArea(_sb.ToString(), GUI.skin.label);
+                    }
+                }
+                GUILayout.EndScrollView();
+
+                GUILayout.BeginHorizontal();
+                {
+                    GUI.SetNextControlName("replInput");
+                    InputField = GUILayout.TextArea(InputField);
+
+                    if (_refocus)
+                    {
+                        _refocusCursorIndex = _textEditor.cursorIndex;
+                        _refocusSelectIndex = _textEditor.selectIndex;
+                        GUI.FocusControl("replInput");
+                        _refocus = false;
+                    }
+                    else if (_refocusCursorIndex >= 0)
+                    {
+                        _textEditor.cursorIndex = _refocusCursorIndex;
+                        _textEditor.selectIndex = _refocusSelectIndex;
+                        _refocusCursorIndex = -1;
+                    }
+
+                    if (GUILayout.Button("Run", GUILayout.ExpandWidth(false)))
+                        AcceptInput();
+
+                    if (GUILayout.Button("History", GUILayout.ExpandWidth(false)))
+                    {
+                        _sb.AppendLine();
+                        _sb.AppendLine("# History of reed commands:");
+                        foreach (var h in _history)
+                            _sb.AppendLine(h);
+
+                        ScrollToBottom();
+                    }
+
+                    if (GUILayout.Button("Autostart", GUILayout.ExpandWidth(false)))
+                    {
+                        _sb.AppendLine("Opening autostart file at " + _autostartFilename);
+
+                        if (!File.Exists(_autostartFilename))
+                            File.WriteAllText(_autostartFilename, "// This C# code will be executed by the REPL near the end of plugin initialization. Only single-line statements are supported. Use echo(string) to write to REPL log and message(string) to write to global log.\n\n");
+
+                        try { Process.Start(_autostartFilename); }
+                        catch (Exception e) { _sb.AppendLine(e.Message); }
+
+                        ScrollToBottom();
+                    }
+
+                    if (GUILayout.Button("Clear log", GUILayout.ExpandWidth(false)))
+                        _sb.Length = 0;
+                }
+                GUILayout.EndHorizontal();
+            }
+            GUILayout.EndVertical();
+
+            CheckReplInput();
+        }
+
+        internal override Rect GetStartingRect(Rect screenSize, float centerWidth, float centerX)
+        {
+            float replPadding = 8;
+            float inspectorHeight = RuntimeUnityEditorCore.INSTANCE.Inspector.GetStartingRect(screenSize, centerWidth, centerX).height;
+
+            return new Rect(
+                centerX,
+                screenSize.yMin + inspectorHeight + replPadding,
+                centerWidth,
+                screenSize.height - inspectorHeight - replPadding
+            );
         }
     }
 }

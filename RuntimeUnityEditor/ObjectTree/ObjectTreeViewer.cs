@@ -101,7 +101,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             InspectorOpenCallback.Invoke(items);
         }
 
-        protected override Rect GetStartingRect(Rect screenSize)
+        internal override Rect GetStartingRect(Rect screenSize, float centerWidth, float centerX)
         {
             Rect _windowRect = new Rect(
                 screenSize.xMax - 350,
@@ -531,6 +531,11 @@ namespace RuntimeUnityEditor.Core.ObjectTree
                 }
             }
             GUILayout.EndHorizontal();
+        }
+
+        protected override bool PreCreatedWindow()
+        {
+            return true;
         }
     }
 }
