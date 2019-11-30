@@ -417,7 +417,7 @@ namespace RuntimeUnityEditor.Core.Inspector
             GUILayout.EndHorizontal();
         }
 
-        public void InspectorUpdate()
+        internal override void Update()
         {
             if (_nextToPush != null)
             {
@@ -434,10 +434,6 @@ namespace RuntimeUnityEditor.Core.Inspector
                 _replWindow.InputField = $"var {CreateVariableString} = ({((InstanceStackEntry)CurrentStackItem).Instance.GetType()}) ((InstanceStackEntry) RuntimeUnityEditorCore.INSTANCE.Inspector.CurrentStackItem).Instance;";
                 _replWindow.AcceptInput();
             }
-        }
-
-        internal override void Update()
-        {
         }
 
         protected override bool PreCreatedWindow()

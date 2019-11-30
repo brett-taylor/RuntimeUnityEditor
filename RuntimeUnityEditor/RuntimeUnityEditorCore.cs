@@ -154,6 +154,8 @@ namespace RuntimeUnityEditor.Core
                 if (IsInCorrectState(window.UpdateOnlyInWindowState, window.ShouldUpdate))
                     window.Update();
             }
+
+            RefreshGameObjectSearcher(false);
         }
 
         private void RefreshGameObjectSearcher(bool full)
