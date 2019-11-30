@@ -4,90 +4,74 @@ using UnityEngine;
 
 namespace RuntimeUnityEditor.Core.Utils
 {
-    public static class BoundsUtils
+    public struct Line
     {
-        public static Bounds CombineBounds(IEnumerable<Renderer> renderers)
+        public Vector3 start;
+        public Vector3 finish;
+    }
+    public class RenderableWrapper
+    {
+        public Color color = Color.yellow;
+        public int instanceId;
+        public bool occluded = false;
+        public virtual List<Line> lines => new List<Line>();
+    }
+    public class LineWrapper : RenderableWrapper
+    {
+        public Vector3 start;
+        public Vector3 finish;
+        public string name;
+        public override List<Line> lines =>
+            new List<Line> { new Line { start = this.start, finish = this.finish } };
+    }
+    public class BoxWrapper : RenderableWrapper
+    {
+        public GameObject obj;
+        public BoxCollider collider;
+        public override List<Line> lines =>
+            BoundUtils.VectorToBox(obj.transform.position,
+                                   Vector3.Scale(collider.size, obj.transform.localScale) / 2);
+    }
+    
+    public static class BoundUtils
+    {
+        private static bool SharesTwoAxis(Vector3 a, Vector3 b)
         {
-            Bounds? b = null;
-            foreach (var renderer in renderers)
-            {
-                if (b == null)
-                    b = renderer.bounds;
-                else
-                    b.Value.Encapsulate(renderer.bounds);
-            }
-
-            if (b == null)
-                throw new ArgumentOutOfRangeException(nameof(renderers), "Need at least one renderer");
-
-            return b.Value;
+            return (a[0] == b[0] && a[1] == b[1]) ||
+                   (a[1] == b[1] && a[2] == b[2]) ||
+                   (a[0] == b[0] && a[2] == b[2]);
         }
-
-        public static Rect BoundsToScreenRect(this Bounds bounds, Camera camera)
+        private static bool SharesOneAxis(Vector3 a, Vector3 b)
         {
-            var cen = bounds.center;
-            var ext = bounds.extents;
-            var extentPoints = new Vector2[8]
-            {
-                camera.WorldToScreenPoint(new Vector3(cen.x-ext.x, cen.y-ext.y, cen.z-ext.z)),
-                camera.WorldToScreenPoint(new Vector3(cen.x+ext.x, cen.y-ext.y, cen.z-ext.z)),
-                camera.WorldToScreenPoint(new Vector3(cen.x-ext.x, cen.y-ext.y, cen.z+ext.z)),
-                camera.WorldToScreenPoint(new Vector3(cen.x+ext.x, cen.y-ext.y, cen.z+ext.z)),
-                camera.WorldToScreenPoint(new Vector3(cen.x-ext.x, cen.y+ext.y, cen.z-ext.z)),
-                camera.WorldToScreenPoint(new Vector3(cen.x+ext.x, cen.y+ext.y, cen.z-ext.z)),
-                camera.WorldToScreenPoint(new Vector3(cen.x-ext.x, cen.y+ext.y, cen.z+ext.z)),
-                camera.WorldToScreenPoint(new Vector3(cen.x+ext.x, cen.y+ext.y, cen.z+ext.z))
-            };
-
-            var min = extentPoints[0];
-            var max = extentPoints[0];
-            foreach (var v in extentPoints)
-            {
-                min = Vector2.Min(min, v);
-                max = Vector2.Max(max, v);
-            }
-
-            return new Rect(min.x, min.y, max.x - min.x, max.y - min.y);
+            return !(a[0] == b[0] && a[1] == b[1]) &&
+                   !(a[1] == b[1] && a[2] == b[2]) &&
+                   !(a[0] == b[0] && a[2] == b[2]) &&
+                   (a[0] == b[0] || a[1] == b[1] || a[2] == b[2]);
         }
-
-        public static Vector2 WorldToGUIPoint(Vector3 world)
+        public static List<Line> VectorToBox(Vector3 origin, Vector3 offset)
         {
-            var screenPoint = Camera.main.WorldToScreenPoint(world);
-            screenPoint.y = Screen.height - screenPoint.y;
-            return screenPoint;
-        }
+            List<Vector3> bounds = new List<Vector3>();
+            bounds.Add(new Vector3(origin.x + offset.x, origin.y + offset.y, origin.z + offset.z));
+            bounds.Add(new Vector3(origin.x + offset.x, origin.y + offset.y, origin.z - offset.z));
+            bounds.Add(new Vector3(origin.x + offset.x, origin.y - offset.y, origin.z + offset.z));
+            bounds.Add(new Vector3(origin.x + offset.x, origin.y - offset.y, origin.z - offset.z));
+            bounds.Add(new Vector3(origin.x - offset.x, origin.y + offset.y, origin.z + offset.z));
+            bounds.Add(new Vector3(origin.x - offset.x, origin.y + offset.y, origin.z - offset.z));
+            bounds.Add(new Vector3(origin.x - offset.x, origin.y - offset.y, origin.z + offset.z));
+            bounds.Add(new Vector3(origin.x - offset.x, origin.y - offset.y, origin.z - offset.z));
 
-        /*public static void VisualizeRenderers(List<Renderer> renderers, int type)
-        {
-            var skins = renderers.Select(x => x as SkinnedMeshRenderer).Where(x => x);
-            foreach (var skin in skins) skin.updateWhenOffscreen = true;
-
-            if ((type & 1) != 0)
+            List<Line> lines = new List<Line>();
+            for (int i = 0; i < 8; ++i)
             {
-                var bounds3d = new GizmoDrawer.VectorLineUpdater();
-                bounds3d.VectorLine = new VectorLine("Bounds3D", new List<Vector3>(24), 1f, LineType.Discrete);
-                bounds3d.Draw = () =>
+                for (int j = i + 1; j < 8; ++j)
                 {
-                    var bounds = CombineBounds(renderers);
-                    bounds3d.VectorLine.MakeCube(bounds.center, bounds.size.x, bounds.size.y, bounds.size.z);
-                    bounds3d.VectorLine.SetColor(Color.red);
-                    bounds3d.VectorLine.Draw();
-                };
+                    if (SharesTwoAxis(bounds[i], bounds[j]))
+                    {
+                        lines.Add(new Line { start = bounds[i], finish = bounds[j] });
+                    }
+                }
             }
-
-            if ((type & 2) != 0)
-            {
-                var bounds2d = new GizmoDrawer.VectorLineUpdater();
-                bounds2d.VectorLine = new VectorLine("Bounds2D", new List<Vector2>(8), 1f, LineType.Discrete);
-                bounds2d.Draw = () =>
-                {
-                    var bounds = CombineBounds(renderers);
-                    var rect = BoundsToScreenRect(bounds, Camera.main);
-                    bounds2d.VectorLine.MakeRect(rect);
-                    bounds2d.VectorLine.SetColor(Color.green);
-                    bounds2d.VectorLine.Draw();
-                };
-            }
-        }*/
+            return lines;
+        }
     }
 }

@@ -22,11 +22,11 @@ namespace RuntimeUnityEditor.Core
         public SettingsData SettingsData { get; private set; }
         public SettingsViewer SettingsViewer { get; private set; }
 
-        private GizmoDrawer _gizmoDrawer;
+        //private GizmoDrawer _gizmoDrawer;
         private GameObjectSearcher _gameObjectSearcher = new GameObjectSearcher();
         private CursorLockMode _previousCursorLockState;
         private bool _previousCursorVisible;
-
+        
         public void Setup(ILoggerWrapper logger, string configPath)
         {
             INSTANCE = this;
@@ -46,8 +46,8 @@ namespace RuntimeUnityEditor.Core
                 }
             };
 
-            _gizmoDrawer = new GizmoDrawer(this);
-            TreeViewer.TreeSelectionChangedCallback = transform => _gizmoDrawer.UpdateState(transform);
+            //_gizmoDrawer = new GizmoDrawer(this);
+            //TreeViewer.TreeSelectionChangedCallback = transform => _gizmoDrawer.UpdateState(transform);
 
             if (UnityFeatureHelper.SupportsCursorIndex &&
                 UnityFeatureHelper.SupportsXml)
@@ -109,11 +109,11 @@ namespace RuntimeUnityEditor.Core
 
                 TreeViewer.Enabled = value;
 
-                if (_gizmoDrawer != null)
+                /*if (_gizmoDrawer != null)
                 {
                     _gizmoDrawer.Show = value;
                     _gizmoDrawer.UpdateState(TreeViewer.SelectedTransform);
-                }
+                }*/
 
                 if (value)
                 {
@@ -122,6 +122,12 @@ namespace RuntimeUnityEditor.Core
                     RefreshGameObjectSearcher(true);
                 }
             }
+        }
+
+        internal void Start()
+        {
+            if (Camera.main.gameObject.GetComponent<LineRender>() == null)
+                Camera.main.gameObject.AddComponent<LineRender>();
         }
 
         internal void Update()
@@ -143,6 +149,7 @@ namespace RuntimeUnityEditor.Core
 
         internal void LateUpdate()
         {
+
             if (Show)
             {
                 Cursor.lockState = CursorLockMode.None;
@@ -152,9 +159,9 @@ namespace RuntimeUnityEditor.Core
 
         private void RefreshGameObjectSearcher(bool full)
         {
-            bool GizmoFilter(GameObject o) => o.name.StartsWith(GizmoDrawer.GizmoObjectName);
-            var gizmosExist = _gizmoDrawer != null && _gizmoDrawer.Lines.Count > 0;
-            _gameObjectSearcher.Refresh(full, gizmosExist ? GizmoFilter : (Predicate<GameObject>)null);
+            //bool GizmoFilter(GameObject o) => o.name.StartsWith(GizmoDrawer.GizmoObjectName);
+            //var gizmosExist = false;// _gizmoDrawer != null && _gizmoDrawer.Lines.Count > 0;
+            _gameObjectSearcher.Refresh(full, null);
         }
 
         private void SetWindowSizes()
