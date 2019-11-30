@@ -4,6 +4,7 @@
     {
         VISIBLE,
         HIDDEN,
-        ALL
+        ALL,
+        CONDITIONAL
     }
 }
