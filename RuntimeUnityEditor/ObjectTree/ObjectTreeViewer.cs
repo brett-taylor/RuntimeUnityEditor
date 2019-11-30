@@ -14,7 +14,7 @@ using Object = UnityEngine.Object;
 
 namespace RuntimeUnityEditor.Core.ObjectTree
 {
-    public sealed class ObjectTreeViewer
+    public class ObjectTreeViewer : IWindow
     {
         internal Action<InspectorStackEntryBase[]> InspectorOpenCallback;
         internal Action<Transform> TreeSelectionChangedCallback;
@@ -103,6 +103,10 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             }
         }
 
+        public WindowState RenderOnlyInWindowState => WindowState.ALL;
+
+        public WindowState UpdateOnlyInWindowState => WindowState.ALL;
+
         public void ClearCaches()
         {
             _imagePreviewCache.Clear();
@@ -113,9 +117,15 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             InspectorOpenCallback.Invoke(items);
         }
 
-        public void UpdateWindowSize(Rect windowRect)
+        public void UpdateWindowSize(Rect screenSize)
         {
-            _windowRect = windowRect;
+            _windowRect = new Rect(
+                screenSize.xMax - 350,
+                screenSize.yMin,
+                350,
+                screenSize.height
+            );
+
             _objectTreeHeight = _windowRect.height / 3;
         }
 
@@ -196,7 +206,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             }
         }
 
-        public void DisplayViewer()
+        public void RenderWindow()
         {
             if (RuntimeUnityEditorCore.INSTANCE.SettingsData.Wireframe && _actuallyInsideOnGui && Event.current.type == EventType.Layout)
                 GL.wireframe = false;

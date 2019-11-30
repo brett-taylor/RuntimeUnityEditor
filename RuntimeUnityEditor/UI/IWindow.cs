@@ -4,8 +4,11 @@ namespace RuntimeUnityEditor.Core.UI
 {
     internal interface IWindow
     {
-        bool VisibleOnlyWhenEditorActive { get; set; }
+        WindowState RenderOnlyInWindowState { get; }
+        WindowState UpdateOnlyInWindowState{ get; }
+
         void UpdateWindowSize(Rect screenSize);
-        void DisplayWindow();
+        void RenderWindow();
+        void Update();
     }
 }

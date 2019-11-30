@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using RuntimeUnityEditor.Core.Gizmos;
 using RuntimeUnityEditor.Core.ObjectTree;
@@ -15,6 +16,7 @@ namespace RuntimeUnityEditor.Core
         public static RuntimeUnityEditorCore INSTANCE { get; private set; }
         internal static KeyCode SHOW_HOT_KEY => KeyCode.F7;
         internal static ILoggerWrapper LOGGER { get; private set; }
+        internal static float SCREEN_OFFSET = 10f;
 
         public Inspector.Inspector Inspector { get; private set; }
         public ObjectTreeViewer TreeViewer { get; private set; }
@@ -26,6 +28,7 @@ namespace RuntimeUnityEditor.Core
         private GameObjectSearcher _gameObjectSearcher = new GameObjectSearcher();
         private CursorLockMode _previousCursorLockState;
         private bool _previousCursorVisible;
+        private readonly List<IWindow> windows = new List<IWindow>();
 
         public void Setup(ILoggerWrapper logger, string configPath)
         {
@@ -48,9 +51,9 @@ namespace RuntimeUnityEditor.Core
 
             _gizmoDrawer = new GizmoDrawer(this);
             TreeViewer.TreeSelectionChangedCallback = transform => _gizmoDrawer.UpdateState(transform);
+            windows.Add(TreeViewer);
 
-            if (UnityFeatureHelper.SupportsCursorIndex &&
-                UnityFeatureHelper.SupportsXml)
+            if (UnityFeatureHelper.SupportsCursorIndex && UnityFeatureHelper.SupportsXml)
             {
                 try
                 {
@@ -68,21 +71,17 @@ namespace RuntimeUnityEditor.Core
 
         internal void OnGUI()
         {
-            if (Show)
+            var originalSkin = GUI.skin;
+            GUI.skin = InterfaceMaker.CustomSkin;
+            ShowCursorIfVisible();
+
+            foreach (IWindow window in windows)
             {
-                var originalSkin = GUI.skin;
-                GUI.skin = InterfaceMaker.CustomSkin;
-
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-
-                Inspector.DisplayInspector();
-                TreeViewer.DisplayViewer();
-                Repl?.DisplayWindow();
-
-                // Restore old skin for maximum compatibility
-                GUI.skin = originalSkin;
+                if (IsInCorrectState(window.RenderOnlyInWindowState))
+                    window.RenderWindow();
             }
+
+            GUI.skin = originalSkin;
         }
 
         public bool Show
@@ -117,37 +116,38 @@ namespace RuntimeUnityEditor.Core
 
                 if (value)
                 {
-                    SetWindowSizes();
-
                     RefreshGameObjectSearcher(true);
                 }
             }
         }
 
-        internal void Update()
+        private void Update()
         {
             if (Input.GetKeyDown(SHOW_HOT_KEY))
                 Show = !Show;
 
-            if (Show)
+            ShowCursorIfVisible();
+
+            var screenRect = new Rect(
+                SCREEN_OFFSET,
+                SCREEN_OFFSET,
+                Screen.width - SCREEN_OFFSET * 2,
+                Screen.height - SCREEN_OFFSET * 2
+            );
+
+            foreach (IWindow window in windows)
             {
-                Inspector.InspectorUpdate();
-                RefreshGameObjectSearcher(false);
+                if (IsInCorrectState(window.RenderOnlyInWindowState))
+                    window.UpdateWindowSize(screenRect);
 
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-
-                TreeViewer.Update();
+                if (IsInCorrectState(window.UpdateOnlyInWindowState))
+                    window.Update();
             }
         }
 
-        internal void LateUpdate()
+        private void LateUpdate()
         {
-            if (Show)
-            {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-            }
+            ShowCursorIfVisible();
         }
 
         private void RefreshGameObjectSearcher(bool full)
@@ -157,40 +157,27 @@ namespace RuntimeUnityEditor.Core
             _gameObjectSearcher.Refresh(full, gizmosExist ? GizmoFilter : (Predicate<GameObject>)null);
         }
 
-        private void SetWindowSizes()
+        private bool IsInCorrectState(WindowState windowState)
         {
-            const int screenOffset = 10;
+            if (windowState == WindowState.ALL)
+                return true;
 
-            var screenRect = new Rect(
-                screenOffset,
-                screenOffset,
-                Screen.width - screenOffset * 2,
-                Screen.height - screenOffset * 2);
+            if (windowState == WindowState.HIDDEN && Show == false)
+                return true;
 
-            var centerWidth = (int)Mathf.Min(850, screenRect.width);
-            var centerX = (int)(screenRect.xMin + screenRect.width / 2 - Mathf.RoundToInt((float)centerWidth / 2));
+            if (windowState == WindowState.VISIBLE && Show == true)
+                return true;
 
-            var inspectorHeight = (int)(screenRect.height / 4) * 3;
-            Inspector.UpdateWindowSize(new Rect(
-                centerX,
-                screenRect.yMin,
-                centerWidth,
-                inspectorHeight));
+            return false;
+        }
 
-            var rightWidth = 350;
-            var treeViewHeight = screenRect.height;
-            TreeViewer.UpdateWindowSize(new Rect(
-                screenRect.xMax - rightWidth,
-                screenRect.yMin,
-                rightWidth,
-                treeViewHeight));
-
-            var replPadding = 8;
-            Repl?.UpdateWindowSize(new Rect(
-                centerX,
-                screenRect.yMin + inspectorHeight + replPadding,
-                centerWidth,
-                screenRect.height - inspectorHeight - replPadding));
+        private void ShowCursorIfVisible()
+        {
+            if (Show)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
         }
     }
 }
