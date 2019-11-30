@@ -75,7 +75,6 @@
     <Compile Include="Settings\SettingsManager.cs" />
     <Compile Include="Settings\SettingsData.cs" />
     <Compile Include="Settings\SettingsViewer.cs" />
-    <Compile Include="Utils\AssetBundleManagerHelper.cs" />
     <Compile Include="ObjectTree\GameObjectSearcher.cs" />
     <Compile Include="Gizmos\IGizmoEntry.cs" />
     <Compile Include="Gizmos\RendererGizmo.cs" />

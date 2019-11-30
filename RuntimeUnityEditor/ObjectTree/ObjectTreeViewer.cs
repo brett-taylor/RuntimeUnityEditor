@@ -236,8 +236,6 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             {
                 DisplayObjectTree();
 
-                DisplayControls();
-
                 DisplayObjectProperties();
 
                 RuntimeUnityEditorCore.INSTANCE.SettingsViewer.DrawSettingsMenu();
@@ -245,11 +243,6 @@ namespace RuntimeUnityEditor.Core.ObjectTree
             GUILayout.EndHorizontal();
 
             GUI.DragWindow();
-        }
-
-        private void DisplayControls()
-        {
-            AssetBundleManagerHelper.DrawButtonIfAvailable();
         }
 
         private void DisplayObjectProperties()
