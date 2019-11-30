@@ -13,6 +13,7 @@ namespace RuntimeUnityEditor.Core.UI
         protected abstract bool ShouldEatInput { get; }
         protected abstract bool IsWindowDraggable { get; }
         protected abstract string WindowTitle { get; }
+        protected virtual bool UpdateWindowSizeEveryFrame => false;
 
         internal abstract void Update();
         protected abstract bool PreCreatedWindow();
@@ -54,7 +55,7 @@ namespace RuntimeUnityEditor.Core.UI
 
         internal void UpdateWindowSize(Rect screenSize)
         {
-            if (_hasRectBeenSet == false)
+            if (UpdateWindowSizeEveryFrame || _hasRectBeenSet == false)
             {
                 var centerWidth = (int) Mathf.Min(850, screenSize.width);
                 var centerX = (int) (screenSize.xMin + screenSize.width / 2 - Mathf.RoundToInt((float) centerWidth / 2));
