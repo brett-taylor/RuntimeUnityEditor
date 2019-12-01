@@ -16,7 +16,8 @@ namespace RuntimeUnityEditor.Core
         public static RuntimeUnityEditorCore INSTANCE { get; private set; }
         internal static KeyCode SHOW_HOT_KEY => KeyCode.F7;
         internal static ILoggerWrapper LOGGER { get; private set; }
-        internal static float SCREEN_OFFSET = 10f;
+        internal const float SCREEN_OFFSET = 10f;
+        private const float UPDATE_OBJECT_TREE_EVERY_X_SECONDS = 5f;
 
         public Inspector.Inspector Inspector { get; private set; }
         public ObjectTreeViewer TreeViewer { get; private set; }
@@ -31,6 +32,7 @@ namespace RuntimeUnityEditor.Core
         private readonly List<Window> windows = new List<Window>();
         private Action<bool> _showOrHideCursor;
         private bool _show;
+        private float updateObjectTreeTimer = 0f;
 
         public void Setup(ILoggerWrapper logger, Action<bool> ShowOrHideCursor)
         {
@@ -148,7 +150,13 @@ namespace RuntimeUnityEditor.Core
                     window.Update();
             }
 
-            RefreshGameObjectSearcher(false);
+            if (updateObjectTreeTimer >= UPDATE_OBJECT_TREE_EVERY_X_SECONDS && Show)
+            {
+                RefreshGameObjectSearcher(false);
+                updateObjectTreeTimer = 0f;
+            }
+            else
+                updateObjectTreeTimer += Time.deltaTime;
         }
 
         private void RefreshGameObjectSearcher(bool full)
