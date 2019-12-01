@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using RuntimeUnityEditor.Core.Inspector.Entries;
+using RuntimeUnityEditor.Core.PinnedVariables;
 using RuntimeUnityEditor.Core.REPL;
 using RuntimeUnityEditor.Core.UI;
 using RuntimeUnityEditor.Core.Utils;
@@ -405,13 +406,13 @@ namespace RuntimeUnityEditor.Core.Inspector
 
                 if (RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.IsTracked(entry.TypeName(), entry))
                 {
-                    if (DnSpyHelper.IsAvailable && GUILayout.Button("Unpin", _pinButtonOptions))
-                        RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.Untrack(entry.TypeName(), entry);
+                    if (GUILayout.Button("Unpin", _pinButtonOptions))
+                        RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.Untrack(entry.Name(), entry);
                 }
                 else
                 {
-                    if (DnSpyHelper.IsAvailable && GUILayout.Button("Pin", _pinButtonOptions))
-                        RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.Track(entry.TypeName(), entry);
+                    if (GUILayout.Button("Pin", _pinButtonOptions))
+                        RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.Track(entry.Name(), entry);
                 }
             }
             GUILayout.EndHorizontal();

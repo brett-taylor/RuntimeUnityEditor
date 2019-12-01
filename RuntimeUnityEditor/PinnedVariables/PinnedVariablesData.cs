@@ -18,6 +18,11 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
             variables.Remove(new Tuple<string, ICacheEntry>(name, entry));
         }
 
+        public void Untrack(Tuple<string, ICacheEntry> tuple)
+        {
+            variables.Remove(tuple);
+        }
+
         public bool IsTracked(string name, ICacheEntry entry)
         {
             return variables.Contains(new Tuple<string, ICacheEntry>(name, entry));
@@ -26,6 +31,11 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
         public int GetCount()
         {
             return variables.Count;
+        }
+
+        public HashSet<Tuple<string, ICacheEntry>>.Enumerator GetEnumerator()
+        {
+            return variables.GetEnumerator();
         }
     }
 }
