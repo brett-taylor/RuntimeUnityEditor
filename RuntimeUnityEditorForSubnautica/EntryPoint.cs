@@ -21,11 +21,7 @@ namespace RuntimeUnityEditorForSubnautica
             {
                 INSTANCE = objectToAddTo.AddComponent<RuntimeUnityEditorCore>();
                 INSTANCE.Setup(
-                    new RuntimeEditorLogger(), 
-                    showCursor => {
-                        UWE.Utils.alwaysLockCursor = !showCursor;
-                        UWE.Utils.lockCursor = !showCursor;
-                    }
+                    new RuntimeEditorLogger()
                 );
             }
         }

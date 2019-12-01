@@ -30,15 +30,13 @@ namespace RuntimeUnityEditor.Core
         private CursorLockMode _previousCursorLockState;
         private bool _previousCursorVisible;
         private readonly List<Window> windows = new List<Window>();
-        private Action<bool> _showOrHideCursor;
         private bool _show;
         private float updateObjectTreeTimer = 0f;
 
-        public void Setup(ILoggerWrapper logger, Action<bool> ShowOrHideCursor)
+        public void Setup(ILoggerWrapper logger)
         {
             INSTANCE = this;
             LOGGER = logger;
-            _showOrHideCursor = ShowOrHideCursor;
 
             SettingsData = SettingsManager.LoadOrCreate();
             DnSpyHelper.SetPath(SettingsData.DNSpyPath, false);
@@ -80,6 +78,7 @@ namespace RuntimeUnityEditor.Core
         {
             var originalSkin = GUI.skin;
             GUI.skin = InterfaceMaker.CustomSkin;
+            ShowCursorIfVisible();
 
             foreach (Window window in windows)
             {
@@ -159,6 +158,11 @@ namespace RuntimeUnityEditor.Core
                 updateObjectTreeTimer += Time.deltaTime;
         }
 
+        private void LateUpdate()
+        {
+            ShowCursorIfVisible();
+        }
+
         private void RefreshGameObjectSearcher(bool full)
         {
             bool GizmoFilter(GameObject o) => o.name.StartsWith(GizmoDrawer.GizmoObjectName);
@@ -187,7 +191,11 @@ namespace RuntimeUnityEditor.Core
 
         private void ShowCursorIfVisible()
         {
-            _showOrHideCursor(Show);
+            if (Show)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
         }
     }
 }
