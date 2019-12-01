@@ -14,7 +14,7 @@ using Component = UnityEngine.Component;
 
 namespace RuntimeUnityEditor.Core.Inspector
 {
-    public sealed class Inspector
+    public sealed class Inspector : Window
     {
         private const int InspectorRecordHeight = 25;
         private readonly Action<Transform> _treelistShowCallback;
@@ -59,6 +59,16 @@ namespace RuntimeUnityEditor.Core.Inspector
         private readonly int _windowId;
 
         public InspectorStackEntryBase CurrentStackItem => _inspectorStack.Peek();
+
+        internal override WindowState RenderOnlyInWindowState => WindowState.VISIBLE;
+
+        internal override WindowState UpdateOnlyInWindowState => WindowState.VISIBLE;
+
+        protected override bool ShouldEatInput => true;
+
+        protected override bool IsWindowDraggable => true;
+
+        protected override string WindowTitle => "Inspector";
 
         private ReplWindow _replWindow;
 
@@ -324,7 +334,123 @@ namespace RuntimeUnityEditor.Core.Inspector
             }
         }
 
-        private void InspectorWindow(int id)
+        private const string SearchBoxName = "InspectorFilterBox";
+
+        private void DrawContentScrollView()
+        {
+            if (_inspectorStack.Count == 0) return;
+
+            var currentItem = CurrentStackItem;
+            currentItem.ScrollPosition = GUILayout.BeginScrollView(currentItem.ScrollPosition);
+            {
+                GUILayout.BeginVertical();
+                {
+                    var visibleFields = string.IsNullOrEmpty(SearchString) ?
+                        _fieldCache :
+                        _fieldCache.Where(x => x.Name().Contains(SearchString, StringComparison.OrdinalIgnoreCase) || x.TypeName().Contains(SearchString, StringComparison.OrdinalIgnoreCase)).ToList();
+
+                    var firstIndex = (int)(currentItem.ScrollPosition.y / InspectorRecordHeight);
+
+                    GUILayout.Space(firstIndex * InspectorRecordHeight);
+
+                    _currentVisibleCount = (int)(_inspectorWindowRect.height / InspectorRecordHeight) - 4;
+                    for (var index = firstIndex; index < Mathf.Min(visibleFields.Count, firstIndex + _currentVisibleCount); index++)
+                    {
+                        var entry = visibleFields[index];
+                        try
+                        {
+                            DrawSingleContentEntry(entry);
+                        }
+                        catch (ArgumentException)
+                        {
+                            // Needed to avoid GUILayout: Mismatched LayoutGroup.Repaint crashes on large lists
+                        }
+                    }
+                    try
+                    {
+                        GUILayout.Space(Mathf.Max(_inspectorWindowRect.height / 2, (visibleFields.Count - firstIndex - _currentVisibleCount) * InspectorRecordHeight));
+                    }
+                    catch
+                    {
+                        // Needed to avoid GUILayout: Mismatched LayoutGroup.Repaint crashes on large lists
+                    }
+                }
+                GUILayout.EndVertical();
+            }
+            GUILayout.EndScrollView();
+        }
+
+        private void DrawSingleContentEntry(ICacheEntry entry)
+        {
+            GUILayout.BeginHorizontal((_inspectorRecordHeight));
+            {
+                GUILayout.Label(entry.TypeName(), (_inspectorTypeWidth));
+
+                var value = entry.GetValue();
+
+                if (entry.CanEnterValue() || value is Exception)
+                    DrawVariableNameEnterButton(entry);
+                else
+                    DrawVariableName(entry);
+
+                if (entry.CanSetValue() &&
+                    CanCovert(ToStringConverter.ObjectToString(value), entry.Type()))
+                    DrawEditableValue(entry, value, GUILayout.ExpandWidth(true));
+                else
+                    DrawValue(value, GUILayout.ExpandWidth(true));
+
+                if (DnSpyHelper.IsAvailable && GUILayout.Button("DNSpy", _dnSpyButtonOptions))
+                    DnSpyHelper.OpenInDnSpy(entry);
+            }
+            GUILayout.EndHorizontal();
+        }
+
+        internal override void Update()
+        {
+            if (_nextToPush != null)
+            {
+                InspectorPush(_nextToPush);
+
+                _nextToPush = null;
+            }
+        }
+
+        private void CreateREPLVariable()
+        {
+            if (CreateVariableString.Length > 0 && CurrentStackItem is InstanceStackEntry)
+            {
+                _replWindow.InputField = $"var {CreateVariableString} = ({((InstanceStackEntry)CurrentStackItem).Instance.GetType()}) ((InstanceStackEntry) RuntimeUnityEditorCore.INSTANCE.Inspector.CurrentStackItem).Instance;";
+                _replWindow.AcceptInput();
+            }
+        }
+
+        protected override bool PreCreatedWindow()
+        {
+            if (_alignedButtonStyle == null)
+            {
+                _alignedButtonStyle = new GUIStyle(GUI.skin.button)
+                {
+                    alignment = TextAnchor.MiddleLeft,
+                    wordWrap = true
+                };
+            }
+
+            if (Event.current.isKey && (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter)) _userHasHitReturn = true;
+
+            while (_inspectorStack.Count > 0 && !_inspectorStack.Peek().EntryIsValid())
+            {
+                var se = _inspectorStack.Pop();
+                RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Message, $"[Inspector] Removed invalid/removed stack object: \"{se.Name}\"");
+            }
+
+            return _inspectorStack.Count != 0;
+        }
+
+        protected override void PostCreatedWindow()
+        {
+        }
+
+        protected override void DrawWindowContents()
         {
             try
             {
@@ -341,7 +467,7 @@ namespace RuntimeUnityEditor.Core.Inspector
 
                             if (_focusSearchBox)
                             {
-                                GUI.FocusWindow(id);
+                                GUI.FocusWindow(_windowID);
                                 GUI.FocusControl(SearchBoxName);
                                 _focusSearchBox = false;
                             }
@@ -433,129 +559,21 @@ namespace RuntimeUnityEditor.Core.Inspector
                 RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Error, "[Inspector] GUI crash: " + ex);
                 InspectorClear();
             }
-
-            GUI.DragWindow();
         }
 
-        private const string SearchBoxName = "InspectorFilterBox";
-
-        private void DrawContentScrollView()
+        internal override Rect GetStartingRect(Rect screenSize, float centerWidth, float centerX)
         {
-            if (_inspectorStack.Count == 0) return;
+            var inspectorHeight = (int) (screenSize.height / 4) * 3;
 
-            var currentItem = CurrentStackItem;
-            currentItem.ScrollPosition = GUILayout.BeginScrollView(currentItem.ScrollPosition);
-            {
-                GUILayout.BeginVertical();
-                {
-                    var visibleFields = string.IsNullOrEmpty(SearchString) ?
-                        _fieldCache :
-                        _fieldCache.Where(x => x.Name().Contains(SearchString, StringComparison.OrdinalIgnoreCase) || x.TypeName().Contains(SearchString, StringComparison.OrdinalIgnoreCase)).ToList();
+            var windowRect = new Rect(
+                centerX,
+                screenSize.yMin,
+                centerWidth,
+                inspectorHeight
+            );
 
-                    var firstIndex = (int)(currentItem.ScrollPosition.y / InspectorRecordHeight);
-
-                    GUILayout.Space(firstIndex * InspectorRecordHeight);
-
-                    _currentVisibleCount = (int)(_inspectorWindowRect.height / InspectorRecordHeight) - 4;
-                    for (var index = firstIndex; index < Mathf.Min(visibleFields.Count, firstIndex + _currentVisibleCount); index++)
-                    {
-                        var entry = visibleFields[index];
-                        try
-                        {
-                            DrawSingleContentEntry(entry);
-                        }
-                        catch (ArgumentException)
-                        {
-                            // Needed to avoid GUILayout: Mismatched LayoutGroup.Repaint crashes on large lists
-                        }
-                    }
-                    try
-                    {
-                        GUILayout.Space(Mathf.Max(_inspectorWindowRect.height / 2, (visibleFields.Count - firstIndex - _currentVisibleCount) * InspectorRecordHeight));
-                    }
-                    catch
-                    {
-                        // Needed to avoid GUILayout: Mismatched LayoutGroup.Repaint crashes on large lists
-                    }
-                }
-                GUILayout.EndVertical();
-            }
-            GUILayout.EndScrollView();
-        }
-
-        private void DrawSingleContentEntry(ICacheEntry entry)
-        {
-            GUILayout.BeginHorizontal((_inspectorRecordHeight));
-            {
-                GUILayout.Label(entry.TypeName(), (_inspectorTypeWidth));
-
-                var value = entry.GetValue();
-
-                if (entry.CanEnterValue() || value is Exception)
-                    DrawVariableNameEnterButton(entry);
-                else
-                    DrawVariableName(entry);
-
-                if (entry.CanSetValue() &&
-                    CanCovert(ToStringConverter.ObjectToString(value), entry.Type()))
-                    DrawEditableValue(entry, value, GUILayout.ExpandWidth(true));
-                else
-                    DrawValue(value, GUILayout.ExpandWidth(true));
-
-                if (DnSpyHelper.IsAvailable && GUILayout.Button("DNSpy", _dnSpyButtonOptions))
-                    DnSpyHelper.OpenInDnSpy(entry);
-            }
-            GUILayout.EndHorizontal();
-        }
-
-        public void DisplayInspector()
-        {
-            if (_alignedButtonStyle == null)
-            {
-                _alignedButtonStyle = new GUIStyle(GUI.skin.button)
-                {
-                    alignment = TextAnchor.MiddleLeft,
-                    wordWrap = true
-                };
-            }
-
-            if (Event.current.isKey && (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter)) _userHasHitReturn = true;
-
-            while (_inspectorStack.Count > 0 && !_inspectorStack.Peek().EntryIsValid())
-            {
-                var se = _inspectorStack.Pop();
-                RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Message, $"[Inspector] Removed invalid/removed stack object: \"{se.Name}\"");
-            }
-
-            if (_inspectorStack.Count != 0)
-            {
-                _inspectorWindowRect = GUILayout.Window(_windowId, _inspectorWindowRect, InspectorWindow, "Inspector");
-                InterfaceMaker.EatInputInRect(_inspectorWindowRect);
-            }
-        }
-
-        public void UpdateWindowSize(Rect windowRect)
-        {
             _inspectorWindowRect = windowRect;
-        }
-
-        public void InspectorUpdate()
-        {
-            if (_nextToPush != null)
-            {
-                InspectorPush(_nextToPush);
-
-                _nextToPush = null;
-            }
-        }
-
-        private void CreateREPLVariable()
-        {
-            if (CreateVariableString.Length > 0 && CurrentStackItem is InstanceStackEntry)
-            {
-                _replWindow.InputField = $"var {CreateVariableString} = ({((InstanceStackEntry)CurrentStackItem).Instance.GetType()}) ((InstanceStackEntry) RuntimeUnityEditorCore.INSTANCE.Inspector.CurrentStackItem).Instance;";
-                _replWindow.AcceptInput();
-            }
+            return windowRect;
         }
     }
 }

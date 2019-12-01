@@ -37,9 +37,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Subnautica\Subnautica_Data\Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
     <Reference Include="mcs">
       <HintPath>..\..\mcs-master\mcs\bin\x64\Debug\mcs.dll</HintPath>
     </Reference>
@@ -75,7 +72,6 @@
     <Compile Include="Settings\SettingsManager.cs" />
     <Compile Include="Settings\SettingsData.cs" />
     <Compile Include="Settings\SettingsViewer.cs" />
-    <Compile Include="Utils\AssetBundleManagerHelper.cs" />
     <Compile Include="ObjectTree\GameObjectSearcher.cs" />
     <Compile Include="Gizmos\IGizmoEntry.cs" />
     <Compile Include="Gizmos\RendererGizmo.cs" />
@@ -98,6 +94,8 @@
     <Compile Include="REPL\TypeHelper.cs" />
     <Compile Include="REPL\REPLWindow.cs" />
     <Compile Include="RuntimeUnityEditorCore.cs" />
+    <Compile Include="UI\Window.cs" />
+    <Compile Include="UI\WindowState.cs" />
     <Compile Include="Utils\BoundsUtils.cs" />
     <Compile Include="Utils\EditorUtilities.cs" />
     <Compile Include="Utils\Extensions.cs" />
@@ -128,8 +126,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="UI\guisharp-box.png" />
-    <EmbeddedResource Include="UI\guisharp-window.png" />
+    <EmbeddedResource Include="UI\Resources\guisharp-box.png" />
+    <EmbeddedResource Include="UI\Resources\guisharp-window.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\ILRepack.Lib.MSBuild.Task.2.0.16.1\build\ILRepack.Lib.MSBuild.Task.targets" Condition="Exists('..\packages\ILRepack.Lib.MSBuild.Task.2.0.16.1\build\ILRepack.Lib.MSBuild.Task.targets')" />

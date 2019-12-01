@@ -6,7 +6,7 @@ namespace RuntimeUnityEditorForSubnautica
     {
         public void Log(LogLevel logLevel, object content)
         {
-            if (logLevel == (LogLevel.Warning | LogLevel.Error | LogLevel.Fatal))
+            if (logLevel == LogLevel.Warning || logLevel == LogLevel.Error || logLevel == LogLevel.Fatal)
             {
                 ErrorMessage.AddMessage(content.ToString());
             }

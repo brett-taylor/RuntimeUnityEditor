@@ -20,7 +20,9 @@ namespace RuntimeUnityEditorForSubnautica
             if (INSTANCE == null)
             {
                 INSTANCE = objectToAddTo.AddComponent<RuntimeUnityEditorCore>();
-                INSTANCE.Setup(new RuntimeEditorLogger(), "");
+                INSTANCE.Setup(
+                    new RuntimeEditorLogger()
+                );
             }
         }
     }

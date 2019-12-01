@@ -13,11 +13,7 @@ namespace RuntimeUnityEditor.Core.Gizmos
         {
             _renderer = renderer;
             _childRenderers = childRenderers;
-            if (renderer == null)
-            {
-                ErrorMessage.AddMessage($"BOOOO renderer was null");
-            }
-            else
+            if (renderer != null)
             {
                 _lineRenderer = renderer.gameObject.AddComponent<LineRenderer>();
             }
