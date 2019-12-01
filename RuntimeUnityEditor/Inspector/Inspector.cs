@@ -549,6 +549,16 @@ namespace RuntimeUnityEditor.Core.Inspector
                     }
                     GUILayout.EndHorizontal();
 
+                    GUILayout.BeginHorizontal(GUI.skin.box, GUILayout.ExpandWidth(true));
+                    {
+                        if (CurrentStackItem is InstanceStackEntry currentItem && currentItem.Instance is Shader)
+                        {
+                            if (GUILayout.Button("Open In Shader Editor", GUILayout.ExpandWidth(true)))
+                                RuntimeUnityEditorCore.LOGGER.Log(LogLevel.Error, $"pressed");
+                        }
+                    }
+                    GUILayout.EndHorizontal();
+
                     GUILayout.BeginVertical(GUI.skin.box);
                     {
                         GUILayout.BeginHorizontal();
