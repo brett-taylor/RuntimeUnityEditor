@@ -52,6 +52,7 @@ namespace RuntimeUnityEditor.Core.Settings
             DrawGizmosSettings();
             DrawClickForGameObjectBehaviour();
             DrawDNSpySettings();
+            DrawPinnedVariablesSettings();
         }
 
         private void DrawClickForGameObjectBehaviour()
@@ -129,6 +130,15 @@ namespace RuntimeUnityEditor.Core.Settings
                         DnSpyHelper.SetPath(RuntimeUnityEditorCore.INSTANCE.SettingsData.DNSpyPath);
                 }
                 GUILayout.EndHorizontal();
+            }
+            GUILayout.EndVertical();
+        }
+
+        private void DrawPinnedVariablesSettings()
+        {
+            GUILayout.BeginVertical(GUI.skin.box);
+            {
+                RuntimeUnityEditorCore.INSTANCE.SettingsData.PinnedVariablesCompactMode = GUILayout.Toggle(RuntimeUnityEditorCore.INSTANCE.SettingsData.PinnedVariablesCompactMode, "Enable Pinned Variables' Compact Mode");
             }
             GUILayout.EndVertical();
         }

@@ -14,10 +14,14 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
         private const float WIDTH_WHEN_EDITOR_HIDDEN = 350f;
         private const float WIDTH_WHEN_EDITOR_VISIBLE = WIDTH_WHEN_EDITOR_HIDDEN + UNPIN_BUTTON_WIDTH;
         private const float UNPIN_BUTTON_WIDTH = 50f;
+        private static readonly Color COMPACT_MODE_BACKGROUND_COLOR = new Color(255, 255, 255, 0.7f);
+        private static readonly Color COMPACT_MODE_FOREGROUND_COLOR = new Color(255, 255, 255, 0.7f);
 
         private PinnedVariablesData _data;
         private readonly GUILayoutOption _nameWidth = GUILayout.Width(170);
         private readonly GUILayoutOption _unPinWidth = GUILayout.Width(UNPIN_BUTTON_WIDTH);
+        private Color _originalGUIBackgroundColor;
+        private Color _originalGUIForegorundColor;
 
         protected override bool ShouldEatInput => ShouldBeVisible();
         protected override bool IsWindowDraggable => true;
@@ -33,11 +37,21 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
 
         protected override bool PreCreatedWindow()
         {
+            _originalGUIBackgroundColor = GUI.backgroundColor;
+            _originalGUIForegorundColor = GUI.color;
+            if (IsInCompactMode())
+            {
+                GUI.backgroundColor = COMPACT_MODE_BACKGROUND_COLOR;
+                GUI.color = COMPACT_MODE_FOREGROUND_COLOR;
+            }
+
             return true;
         }
 
         protected override void PostCreatedWindow()
         {
+            GUI.backgroundColor = _originalGUIBackgroundColor;
+            GUI.color = _originalGUIForegorundColor;
         }
 
         internal override Rect GetStartingRect(Rect screenSize, float centerWidth, float centerX)
@@ -81,6 +95,9 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
 
         private void DrawTableHeader()
         {
+            if (IsInCompactMode() == true)
+                return;
+
             GUILayout.BeginHorizontal();
             {
                 GUILayout.Space(1);
@@ -97,6 +114,11 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
             GUILayout.TextArea(ToStringConverter.ObjectToString(tuple.Item2.GetValue()), GUI.skin.label, GUILayout.ExpandWidth(true));
             if (RuntimeUnityEditorCore.INSTANCE.Show && GUILayout.Button("Unpin", _unPinWidth))
                 RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.Untrack(tuple);
+        }
+
+        private bool IsInCompactMode()
+        {
+            return RuntimeUnityEditorCore.INSTANCE.SettingsData.PinnedVariablesCompactMode && RuntimeUnityEditorCore.INSTANCE.Show == false && _data.GetCount() >= 1;
         }
     }
 }
