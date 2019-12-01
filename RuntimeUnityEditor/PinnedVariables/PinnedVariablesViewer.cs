@@ -58,7 +58,7 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
             return new Rect(
                 RuntimeUnityEditorCore.SCREEN_OFFSET,
                 RuntimeUnityEditorCore.SCREEN_OFFSET,
-                RuntimeUnityEditorCore.INSTANCE.Show ? WIDTH_WHEN_EDITOR_VISIBLE : WIDTH_WHEN_EDITOR_HIDDEN,
+                IsEditorOpen() ? WIDTH_WHEN_EDITOR_VISIBLE : WIDTH_WHEN_EDITOR_HIDDEN,
                 1f
             );
         }
@@ -89,7 +89,7 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
 
         internal override bool ShouldBeVisible()
         {
-            return RuntimeUnityEditorCore.INSTANCE.Show || _data.GetCount() >= 1;
+            return IsEditorOpen() || _data.GetCount() >= 1;
         }
 
         private void DrawTableHeader()
@@ -111,13 +111,18 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
         {
             GUILayout.TextArea(message, GUI.skin.label, _nameWidth);
             GUILayout.TextArea(ToStringConverter.ObjectToString(entry.GetValue()), GUI.skin.label, GUILayout.ExpandWidth(true));
-            if (RuntimeUnityEditorCore.INSTANCE.Show && GUILayout.Button("Unpin", _unPinWidth))
+            if (IsEditorOpen() && GUILayout.Button("Unpin", _unPinWidth))
                 RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.Untrack(entry);
+        }
+
+        private bool IsEditorOpen()
+        {
+            return RuntimeUnityEditorCore.INSTANCE.Show;
         }
 
         private bool IsInCompactMode()
         {
-            return RuntimeUnityEditorCore.INSTANCE.SettingsData.PinnedVariablesCompactMode && RuntimeUnityEditorCore.INSTANCE.Show == false && _data.GetCount() >= 1;
+            return RuntimeUnityEditorCore.INSTANCE.SettingsData.PinnedVariablesCompactMode && IsEditorOpen() == false && _data.GetCount() >= 1;
         }
     }
 }
