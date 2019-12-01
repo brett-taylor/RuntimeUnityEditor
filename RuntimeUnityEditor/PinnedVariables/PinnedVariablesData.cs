@@ -5,11 +5,11 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
 {
     public class PinnedVariablesData
     {
-        private readonly Dictionary<ICacheEntry, string> variables = new Dictionary<ICacheEntry, string>();
+        private readonly Dictionary<ICacheEntry, PinnedVariable> variables = new Dictionary<ICacheEntry, PinnedVariable>();
 
         public void Track(string name, ICacheEntry entry)
         {
-            variables.Add(entry, name);
+            variables.Add(entry, new PinnedVariable(name));
         }
 
         public void Untrack(ICacheEntry entry)
@@ -27,7 +27,7 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
             return variables.Count;
         }
 
-        public Dictionary<ICacheEntry, string>.Enumerator GetEnumerator()
+        public Dictionary<ICacheEntry, PinnedVariable>.Enumerator GetEnumerator()
         {
             return variables.GetEnumerator();
         }

@@ -99,17 +99,25 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
 
             GUILayout.BeginHorizontal();
             {
-                GUILayout.Space(1);
+                //GUILayout.Space(1);
                 GUILayout.Label("Name", GUI.skin.box, _nameWidth);
-                GUILayout.Space(1);
+                //GUILayout.Space(1);
                 GUILayout.Label("Value", GUI.skin.box, GUILayout.ExpandWidth(true));
             }
             GUILayout.EndHorizontal();
         }
 
-        private void DrawRow(ICacheEntry entry, string message)
+        private void DrawRow(ICacheEntry entry, PinnedVariable pinnedVariable)
         {
-            GUILayout.TextArea(message, GUI.skin.label, _nameWidth);
+            if (IsEditorOpen())
+            {
+                pinnedVariable.Name = GUILayout.TextField(pinnedVariable.Name, GUI.skin.textField, _nameWidth);
+            }
+            else
+            {
+                GUILayout.TextArea(pinnedVariable.Name, GUI.skin.label, _nameWidth);
+            }
+
             GUILayout.TextArea(ToStringConverter.ObjectToString(entry.GetValue()), GUI.skin.label, GUILayout.ExpandWidth(true));
             if (IsEditorOpen() && GUILayout.Button("Unpin", _unPinWidth))
                 RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.Untrack(entry);
