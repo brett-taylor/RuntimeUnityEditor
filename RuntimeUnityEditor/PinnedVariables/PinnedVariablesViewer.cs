@@ -10,8 +10,6 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
 {
     public class PinnedVariablesViewer : Window
     {
-        private const float HEIGHT_WHEN_NOTIHNG_PINNED = 40f;
-        private const float BASE_HEIGHT_WITH_PINNED = 60f;
         private const float WIDTH_WHEN_EDITOR_HIDDEN = 350f;
         private const float WIDTH_WHEN_EDITOR_VISIBLE = WIDTH_WHEN_EDITOR_HIDDEN + UNPIN_BUTTON_WIDTH;
         private const float UNPIN_BUTTON_WIDTH = 50f;
@@ -61,7 +59,7 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
                 RuntimeUnityEditorCore.SCREEN_OFFSET,
                 RuntimeUnityEditorCore.SCREEN_OFFSET,
                 RuntimeUnityEditorCore.INSTANCE.Show ? WIDTH_WHEN_EDITOR_VISIBLE : WIDTH_WHEN_EDITOR_HIDDEN,
-                _data.GetCount() == 0 ? HEIGHT_WHEN_NOTIHNG_PINNED : BASE_HEIGHT_WITH_PINNED
+                1f
             );
         }
 
