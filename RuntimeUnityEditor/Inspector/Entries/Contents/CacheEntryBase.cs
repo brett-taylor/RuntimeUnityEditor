@@ -68,5 +68,7 @@ namespace RuntimeUnityEditor.Core.Inspector.Entries
             }
             return _canEnter.Value;
         }
+
+        public abstract bool Equals(ICacheEntry other);
     }
 }

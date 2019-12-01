@@ -69,6 +69,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DnSpyHelper.cs" />
+    <Compile Include="PinnedVariables\PinnedVariable.cs" />
+    <Compile Include="PinnedVariables\PinnedVariablesData.cs" />
+    <Compile Include="PinnedVariables\PinnedVariablesViewer.cs" />
     <Compile Include="Settings\SettingsManager.cs" />
     <Compile Include="Settings\SettingsData.cs" />
     <Compile Include="Settings\SettingsViewer.cs" />

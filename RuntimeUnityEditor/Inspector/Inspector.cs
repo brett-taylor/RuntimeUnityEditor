@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using RuntimeUnityEditor.Core.Inspector.Entries;
+using RuntimeUnityEditor.Core.PinnedVariables;
 using RuntimeUnityEditor.Core.REPL;
 using RuntimeUnityEditor.Core.UI;
 using RuntimeUnityEditor.Core.Utils;
@@ -23,6 +24,7 @@ namespace RuntimeUnityEditor.Core.Inspector
         private readonly GUILayoutOption _inspectorRecordHeight = GUILayout.Height(InspectorRecordHeight);
         private readonly GUILayoutOption _dnSpyButtonOptions = GUILayout.Width(50);
         private readonly GUILayoutOption _createREPLVariableWidth = GUILayout.Width(80);
+        private readonly GUILayoutOption _pinButtonOptions = GUILayout.Width(50);
 
         private GUIStyle _alignedButtonStyle;
 
@@ -384,7 +386,7 @@ namespace RuntimeUnityEditor.Core.Inspector
         {
             GUILayout.BeginHorizontal((_inspectorRecordHeight));
             {
-                GUILayout.Label(entry.TypeName(), (_inspectorTypeWidth));
+                GUILayout.Label(entry.TypeName(), _inspectorTypeWidth);
 
                 var value = entry.GetValue();
 
@@ -401,6 +403,17 @@ namespace RuntimeUnityEditor.Core.Inspector
 
                 if (DnSpyHelper.IsAvailable && GUILayout.Button("DNSpy", _dnSpyButtonOptions))
                     DnSpyHelper.OpenInDnSpy(entry);
+
+                if (RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.IsTracked(entry))
+                {
+                    if (GUILayout.Button("Unpin", _pinButtonOptions))
+                        RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.Untrack(entry);
+                }
+                else
+                {
+                    if (GUILayout.Button("Pin", _pinButtonOptions))
+                        RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.Track(entry.Name(), entry);
+                }
             }
             GUILayout.EndHorizontal();
         }

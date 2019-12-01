@@ -11,5 +11,6 @@ namespace RuntimeUnityEditor.Core.Settings
         public bool ShowGizmosOutsideEditor = false;
         public bool Wireframe = false;
         public string DNSpyPath = "";
+        public bool PinnedVariablesCompactMode = true;
     }
 }

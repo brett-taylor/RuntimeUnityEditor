@@ -89,5 +89,36 @@ namespace RuntimeUnityEditor.Core.Inspector.Entries
         {
             return _valueCache == null || base.CanEnterValue();
         }
+
+        public override bool Equals(ICacheEntry other)
+        {
+            if (other == null)
+                return false;
+
+            if (other is MethodCacheEntry == false)
+                return false;
+
+            var otherTyped = (MethodCacheEntry) other;
+            return MethodInfo == otherTyped.MethodInfo;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null)
+                return false;
+
+            if (ReferenceEquals(this, obj))
+                return true;
+
+            if (obj.GetType() != GetType())
+                return false;
+
+            return Equals((MethodCacheEntry) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return 0;
+        }
     }
 }
