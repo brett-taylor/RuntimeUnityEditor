@@ -386,7 +386,6 @@ namespace RuntimeUnityEditor.Core.Inspector
         {
             GUILayout.BeginHorizontal((_inspectorRecordHeight));
             {
-                GUILayout.Label($"Type: {entry.GetType()}");
                 GUILayout.Label(entry.TypeName(), _inspectorTypeWidth);
 
                 var value = entry.GetValue();
