@@ -386,7 +386,8 @@ namespace RuntimeUnityEditor.Core.Inspector
         {
             GUILayout.BeginHorizontal((_inspectorRecordHeight));
             {
-                GUILayout.Label(entry.TypeName(), (_inspectorTypeWidth));
+                GUILayout.Label($"Type: {entry.GetType()}");
+                GUILayout.Label(entry.TypeName(), _inspectorTypeWidth);
 
                 var value = entry.GetValue();
 
@@ -404,10 +405,10 @@ namespace RuntimeUnityEditor.Core.Inspector
                 if (DnSpyHelper.IsAvailable && GUILayout.Button("DNSpy", _dnSpyButtonOptions))
                     DnSpyHelper.OpenInDnSpy(entry);
 
-                if (RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.IsTracked(entry.TypeName(), entry))
+                if (RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.IsTracked(entry))
                 {
                     if (GUILayout.Button("Unpin", _pinButtonOptions))
-                        RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.Untrack(entry.Name(), entry);
+                        RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.Untrack(entry);
                 }
                 else
                 {

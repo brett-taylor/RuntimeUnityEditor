@@ -1,31 +1,25 @@
-﻿using Mono.CSharp;
-using RuntimeUnityEditor.Core.Inspector.Entries;
+﻿using RuntimeUnityEditor.Core.Inspector.Entries;
 using System.Collections.Generic;
 
 namespace RuntimeUnityEditor.Core.PinnedVariables
 {
     public class PinnedVariablesData
     {
-        private readonly HashSet<Tuple<string, ICacheEntry>> variables = new HashSet<Tuple<string, ICacheEntry>>();
+        private readonly Dictionary<ICacheEntry, string> variables = new Dictionary<ICacheEntry, string>();
 
         public void Track(string name, ICacheEntry entry)
         {
-            variables.Add(new Tuple<string, ICacheEntry>(name, entry));
+            variables.Add(entry, name);
         }
 
-        public void Untrack(string name, ICacheEntry entry)
+        public void Untrack(ICacheEntry entry)
         {
-            variables.Remove(new Tuple<string, ICacheEntry>(name, entry));
+            variables.Remove(entry);
         }
 
-        public void Untrack(Tuple<string, ICacheEntry> tuple)
+        public bool IsTracked(ICacheEntry entry)
         {
-            variables.Remove(tuple);
-        }
-
-        public bool IsTracked(string name, ICacheEntry entry)
-        {
-            return variables.Contains(new Tuple<string, ICacheEntry>(name, entry));
+            return variables.ContainsKey(entry);
         }
 
         public int GetCount()
@@ -33,7 +27,7 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
             return variables.Count;
         }
 
-        public HashSet<Tuple<string, ICacheEntry>>.Enumerator GetEnumerator()
+        public Dictionary<ICacheEntry, string>.Enumerator GetEnumerator()
         {
             return variables.GetEnumerator();
         }

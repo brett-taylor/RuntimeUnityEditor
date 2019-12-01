@@ -3,6 +3,7 @@ using RuntimeUnityEditor.Core.Inspector;
 using RuntimeUnityEditor.Core.Inspector.Entries;
 using RuntimeUnityEditor.Core.UI;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RuntimeUnityEditor.Core.PinnedVariables
@@ -73,11 +74,11 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
             else
             {
                 DrawTableHeader();
-                foreach (Tuple<string, ICacheEntry> tuple in _data)
+                foreach (var i in _data)
                 {
                     GUILayout.BeginHorizontal();
                     {
-                        DrawRow(tuple);
+                        DrawRow(i.Key, i.Value);
                     }
                     GUILayout.EndHorizontal();
                 }
@@ -108,12 +109,12 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
             GUILayout.EndHorizontal();
         }
 
-        private void DrawRow(Tuple<string, ICacheEntry> tuple)
+        private void DrawRow(ICacheEntry entry, string message)
         {
-            GUILayout.TextArea(tuple.Item1, GUI.skin.label, _nameWidth);
-            GUILayout.TextArea(ToStringConverter.ObjectToString(tuple.Item2.GetValue()), GUI.skin.label, GUILayout.ExpandWidth(true));
+            GUILayout.TextArea(message, GUI.skin.label, _nameWidth);
+            GUILayout.TextArea(ToStringConverter.ObjectToString(entry.GetValue()), GUI.skin.label, GUILayout.ExpandWidth(true));
             if (RuntimeUnityEditorCore.INSTANCE.Show && GUILayout.Button("Unpin", _unPinWidth))
-                RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.Untrack(tuple);
+                RuntimeUnityEditorCore.INSTANCE.PinnedVariablesData.Untrack(entry);
         }
 
         private bool IsInCompactMode()

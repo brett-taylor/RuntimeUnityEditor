@@ -2,7 +2,7 @@
 
 namespace RuntimeUnityEditor.Core.Inspector.Entries
 {
-    public interface ICacheEntry
+    public interface ICacheEntry : IEquatable<ICacheEntry>
     {
         string Name();
         string TypeName();

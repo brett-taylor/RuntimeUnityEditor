@@ -43,6 +43,37 @@ namespace RuntimeUnityEditor.Core.Inspector.Entries
         {
             return false;
         }
+
+        public override bool Equals(ICacheEntry other)
+        {
+            if (other == null)
+                return false;
+
+            if (other is CallbackCacheEntry == false)
+                return false;
+
+            var otherTyped = (CallbackCacheEntry) other;
+            return _callback == otherTyped._callback && _message.Equals(otherTyped._message);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null)
+                return false;
+
+            if (ReferenceEquals(this, obj))
+                return true;
+
+            if (obj.GetType() != GetType())
+                return false;
+
+            return Equals((CallbackCacheEntry) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return 0;
+        }
     }
 
     public class CallbackCacheEntry<T> : CacheEntryBase
@@ -84,6 +115,37 @@ namespace RuntimeUnityEditor.Core.Inspector.Entries
         public override bool CanSetValue()
         {
             return false;
+        }
+
+        public override bool Equals(ICacheEntry other)
+        {
+            if (other == null)
+                return false;
+
+            if (other is CallbackCacheEntry<T> == false)
+                return false;
+
+            var otherTyped = (CallbackCacheEntry<T>) other;
+            return _callback == otherTyped._callback && _message == otherTyped._message;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null)
+                return false;
+
+            if (ReferenceEquals(this, obj))
+                return true;
+
+            if (obj.GetType() != GetType())
+                return false;
+
+            return Equals((CallbackCacheEntry<T>) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return 0;
         }
     }
 }
