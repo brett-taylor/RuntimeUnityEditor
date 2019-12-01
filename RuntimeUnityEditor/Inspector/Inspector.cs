@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using RuntimeUnityEditor.Core.Inspector.Entries;
-using RuntimeUnityEditor.Core.PinnedVariables;
 using RuntimeUnityEditor.Core.REPL;
 using RuntimeUnityEditor.Core.UI;
 using RuntimeUnityEditor.Core.Utils;
@@ -307,6 +306,8 @@ namespace RuntimeUnityEditor.Core.Inspector
                 CreateVariableString = char.ToLowerInvariant(stackEntry.Name[0]) + stackEntry.Name.Substring(1);
                 CreateVariableString = CreateVariableString.Replace(" ", "");
                 CreateVariableString = CreateVariableString.Replace(":", "");
+                CreateVariableString = CreateVariableString.Replace("(", "");
+                CreateVariableString = CreateVariableString.Replace(")", "");
             }
             else
             {
@@ -432,7 +433,7 @@ namespace RuntimeUnityEditor.Core.Inspector
         {
             if (CreateVariableString.Length > 0 && CurrentStackItem is InstanceStackEntry)
             {
-                _replWindow.InputField = $"var {CreateVariableString} = ({((InstanceStackEntry)CurrentStackItem).Instance.GetType()}) ((InstanceStackEntry) RuntimeUnityEditorCore.INSTANCE.Inspector.CurrentStackItem).Instance;";
+                _replWindow.InputField = $"var {CreateVariableString} = geti()";
                 _replWindow.AcceptInput();
             }
         }
