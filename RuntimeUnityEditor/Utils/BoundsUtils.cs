@@ -27,10 +27,10 @@ namespace RuntimeUnityEditor.Core.Utils
     public class BoxWrapper : RenderableWrapper
     {
         public GameObject obj;
-        public BoxCollider collider;
+        public Bounds colliderBounds;
         public override List<Line> lines =>
-            BoundUtils.VectorToBox(obj.transform.position + collider.center,
-                                   Vector3.Scale(collider.size, obj.transform.localScale) / 2);
+            BoundUtils.VectorToBox(colliderBounds.center,
+                                   Vector3.Scale(colliderBounds.size, obj.transform.localScale) / 2);
     }
     
     public static class BoundUtils

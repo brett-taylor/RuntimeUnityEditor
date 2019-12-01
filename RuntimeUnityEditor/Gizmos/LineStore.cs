@@ -1,5 +1,7 @@
 using RuntimeUnityEditor.Core.Utils;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace RuntimeUnityEditor.Core.Gizmos
@@ -36,16 +38,31 @@ namespace RuntimeUnityEditor.Core.Gizmos
             nonOccludedRender = new List<RenderableWrapper>();
         }
 
-        public static void AddBox(GameObject objWithBoxCollider)
+        public static void AddAllBoxColliders(GameObject objWithBoxCollider)
         {
             foreach (var collider in objWithBoxCollider.GetComponents<BoxCollider>()) {
                 var box = new BoxWrapper();
                 box.color = Color.green;
                 box.obj = objWithBoxCollider;
                 box.instanceId = box.obj.GetInstanceID();
-                box.collider = collider;
+                box.colliderBounds = collider.bounds;
                 AddRenderable(box);
             }
+        }
+
+        public static BoxWrapper AddCompositeBoxCollider(GameObject objWithBoxCollider)
+        {
+            var colliders = objWithBoxCollider.GetComponents<BoxCollider>();
+            Bounds b = colliders[0].bounds;
+            for (int i = 1; i < colliders.Length; ++i)
+                b.Encapsulate(colliders[i].bounds);
+            var box = new BoxWrapper();
+            box.color = Color.green;
+            box.obj = objWithBoxCollider;
+            box.instanceId = box.obj.GetInstanceID();
+            box.colliderBounds = b;
+            AddRenderable(box);
+            return box;
         }
 
         public static void AddRenderable(RenderableWrapper wrapper)
