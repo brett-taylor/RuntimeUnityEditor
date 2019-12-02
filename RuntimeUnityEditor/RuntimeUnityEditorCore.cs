@@ -89,7 +89,7 @@ namespace RuntimeUnityEditor.Core
 
             foreach (Window window in windows)
             {
-                if (IsInCorrectState(window.RenderOnlyInWindowState, window.ShouldBeVisible))
+                if (IsInCorrectState(window.RenderOnlyInWindowState))
                     window.RenderWindow();
             }
 
@@ -149,10 +149,10 @@ namespace RuntimeUnityEditor.Core
 
             foreach (Window window in windows)
             {
-                if (IsInCorrectState(window.RenderOnlyInWindowState, window.ShouldBeVisible))
+                if (IsInCorrectState(window.RenderOnlyInWindowState))
                     window.UpdateWindowSize(screenRect);
 
-                if (IsInCorrectState(window.UpdateOnlyInWindowState, window.ShouldUpdate))
+                if (IsInCorrectState(window.UpdateOnlyInWindowState))
                     window.Update();
             }
 
@@ -177,7 +177,7 @@ namespace RuntimeUnityEditor.Core
             _gameObjectSearcher.Refresh(full, gizmosExist ? GizmoFilter : (Predicate<GameObject>)null);
         }
 
-        private bool IsInCorrectState(WindowState windowState, Func<bool> conditional)
+        private bool IsInCorrectState(WindowState windowState)
         {
             if (windowState == WindowState.ALL)
                 return true;
@@ -187,11 +187,6 @@ namespace RuntimeUnityEditor.Core
 
             if (windowState == WindowState.VISIBLE && Show == true)
                 return true;
-
-            if (windowState == WindowState.CONDITIONAL)
-            {
-                return conditional();
-            }
 
             return false;
         }

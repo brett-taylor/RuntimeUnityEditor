@@ -26,7 +26,7 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
         protected override bool IsWindowDraggable => true;
         protected override string WindowTitle => "Pinned Variables";
         protected override bool UpdateWindowSizeEveryFrame => true;
-        internal override WindowState RenderOnlyInWindowState => WindowState.CONDITIONAL;
+        internal override WindowState RenderOnlyInWindowState => WindowState.ALL;
         internal override WindowState UpdateOnlyInWindowState => WindowState.ALL;
 
         public PinnedVariablesViewer(PinnedVariablesData pinnedVariablesData)
@@ -44,7 +44,7 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
                 GUI.color = COMPACT_MODE_FOREGROUND_COLOR;
             }
 
-            return true;
+            return ShouldBeVisible();
         }
 
         protected override void PostCreatedWindow()
@@ -87,7 +87,7 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
         {
         }
 
-        internal override bool ShouldBeVisible()
+        private bool ShouldBeVisible()
         {
             return IsEditorOpen() || _data.GetCount() >= 1;
         }
