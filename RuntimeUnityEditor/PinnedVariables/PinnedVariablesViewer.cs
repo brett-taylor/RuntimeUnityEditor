@@ -56,8 +56,8 @@ namespace RuntimeUnityEditor.Core.PinnedVariables
         internal override Rect GetStartingRect(Rect screenSize, float centerWidth, float centerX)
         {
             return new Rect(
-                RuntimeUnityEditorCore.SCREEN_OFFSET,
-                RuntimeUnityEditorCore.SCREEN_OFFSET,
+                PADDING,
+                PADDING,
                 IsEditorOpen() ? WIDTH_WHEN_EDITOR_VISIBLE : WIDTH_WHEN_EDITOR_HIDDEN,
                 1f
             );

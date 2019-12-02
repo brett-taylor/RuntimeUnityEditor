@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using RuntimeUnityEditor.Core.Gizmos;
 using RuntimeUnityEditor.Core.ObjectTree;
 using RuntimeUnityEditor.Core.PinnedVariables;
 using RuntimeUnityEditor.Core.REPL;
 using RuntimeUnityEditor.Core.Settings;
+using RuntimeUnityEditor.Core.MaterialEditor;
 using RuntimeUnityEditor.Core.UI;
 using RuntimeUnityEditor.Core.Utils;
 using UnityEngine;
@@ -17,7 +17,6 @@ namespace RuntimeUnityEditor.Core
         public static RuntimeUnityEditorCore INSTANCE { get; private set; }
         internal static KeyCode SHOW_HOT_KEY => KeyCode.F7;
         internal static ILoggerWrapper LOGGER { get; private set; }
-        internal const float SCREEN_OFFSET = 10f;
         private const float UPDATE_OBJECT_TREE_EVERY_X_SECONDS = 5f;
 
         public Inspector.Inspector Inspector { get; private set; }
@@ -27,6 +26,8 @@ namespace RuntimeUnityEditor.Core
         public SettingsViewer SettingsViewer { get; private set; }
         public PinnedVariablesData PinnedVariablesData { get; private set; }
         public PinnedVariablesViewer PinnedVariablesViewer { get; private set; }
+        public MaterialEditorData MaterialEditorData { get; private set; }
+        public MaterialEditorViewer MaterialEditorViewer { get; private set; }
 
         private GizmoDrawer _gizmoDrawer;
         private GameObjectSearcher _gameObjectSearcher = new GameObjectSearcher();
@@ -79,6 +80,10 @@ namespace RuntimeUnityEditor.Core
             PinnedVariablesData = new PinnedVariablesData();
             PinnedVariablesViewer = new PinnedVariablesViewer(PinnedVariablesData);
             windows.Add(PinnedVariablesViewer);
+
+            MaterialEditorData = new MaterialEditorData();
+            MaterialEditorViewer = new MaterialEditorViewer(MaterialEditorData);
+            windows.Add(MaterialEditorViewer);
         }
 
         internal void OnGUI()
@@ -141,10 +146,10 @@ namespace RuntimeUnityEditor.Core
             ShowCursorIfVisible();
 
             var screenRect = new Rect(
-                SCREEN_OFFSET,
-                SCREEN_OFFSET,
-                Screen.width - SCREEN_OFFSET * 2,
-                Screen.height - SCREEN_OFFSET * 2
+                Window.PADDING,
+                Window.PADDING,
+                Screen.width - Window.PADDING * 2,
+                Screen.height - Window.PADDING * 2
             );
 
             foreach (Window window in windows)

@@ -4,6 +4,8 @@ namespace RuntimeUnityEditor.Core.UI
 {
     public abstract class Window
     {
+        public static readonly float PADDING = 10f;
+
         protected Rect _windowRect;
         protected readonly int _windowID;
         private bool _hasRectBeenSet = false;
