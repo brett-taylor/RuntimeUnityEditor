@@ -1,0 +1,9 @@
+{
+  "Id": "RuntimeEditorForSubnautiac",
+  "DisplayName": "Runtime Editor",
+  "Author": "WaisieMilliams",
+  "Version": "1.0.0",
+  "Enable": true,
+  "Game": "Subnautica",
+  "AssemblyName": "RuntimeUnityEditorForSubnautica.dll",
+}
