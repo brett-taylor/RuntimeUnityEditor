@@ -200,8 +200,8 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
         internal override void Update()
         {
-            bool isLeftClickDown = RuntimeUnityEditorCore.INSTANCE.SettingsData.EnableClickForParentGameObject && Input.GetMouseButtonDown(0);
-            bool isRightClickDown = RuntimeUnityEditorCore.INSTANCE.SettingsData.EnableClickForChildGameObject && Input.GetMouseButtonDown(1);
+            var isLeftClickDown = RuntimeUnityEditorCore.INSTANCE.SettingsData.EnableClickForParentGameObject && Input.GetMouseButtonDown(0);
+            var isRightClickDown = RuntimeUnityEditorCore.INSTANCE.SettingsData.EnableClickForChildGameObject && Input.GetMouseButtonDown(1);
 
             if (isLeftClickDown || isRightClickDown)
             {
