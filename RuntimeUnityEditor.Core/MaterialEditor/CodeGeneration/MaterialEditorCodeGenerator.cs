@@ -37,7 +37,7 @@ namespace RuntimeUnityEditor.Core.MaterialEditor.CodeGeneration
 
         private static string GenerateFileName()
         {
-            return $"{FILE_NAME_PREFIX}{DateTime.Now:yyyy-MM-dd-H-mm}{FILE_NAME_POSTFIX}";
+            return $"{FILE_NAME_PREFIX}{DateTime.Now:yyyy-MM-dd-H-mm-ss-ff}{FILE_NAME_POSTFIX}";
         }
 
         private static void WriteHeader(Material material, TextWriter writer)

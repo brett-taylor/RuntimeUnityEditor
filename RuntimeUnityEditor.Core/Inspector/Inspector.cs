@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using RuntimeUnityEditor.Core.Inspector.Entries;
 using RuntimeUnityEditor.Core.MaterialEditor;
+using RuntimeUnityEditor.Core.MaterialEditor.Properties;
 using RuntimeUnityEditor.Core.REPL;
 using RuntimeUnityEditor.Core.UI;
 using RuntimeUnityEditor.Core.Utils;
@@ -552,9 +553,22 @@ namespace RuntimeUnityEditor.Core.Inspector
 
                     GUILayout.BeginHorizontal(GUI.skin.box, GUILayout.ExpandWidth(true));
                     {
-                        if (_inspectorStack.Count > 0 && CurrentStackItem is InstanceStackEntry currentItem && currentItem.Instance is Material material)
-                            if (GUILayout.Button("Open In Material Editor", GUILayout.ExpandWidth(true)))
-                                new MaterialEditorViewer(material);
+                        if (_inspectorStack.Count > 0 && CurrentStackItem is InstanceStackEntry currentItem)
+                        {
+                            Material editMaterial = null;
+                            switch (currentItem.Instance)
+                            {
+                                case Material material:
+                                    editMaterial = material;
+                                    break;
+                                case Renderer renderer:
+                                    editMaterial = renderer.material;
+                                    break;
+                            }
+
+                            if (editMaterial && GUILayout.Button("Open In Material Editor", GUILayout.ExpandWidth(true)))
+                                new MaterialEditorViewer(editMaterial);
+                        }
                     }
                     GUILayout.EndHorizontal();
 

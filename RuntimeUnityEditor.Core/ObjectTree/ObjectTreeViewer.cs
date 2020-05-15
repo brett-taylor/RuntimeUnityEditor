@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using RuntimeUnityEditor.Core.Inspector;
 using RuntimeUnityEditor.Core.Inspector.Entries;
+using RuntimeUnityEditor.Core.MaterialEditor;
 using RuntimeUnityEditor.Core.UI;
 using RuntimeUnityEditor.Core.Utils;
 using UnityEngine;
@@ -330,7 +331,17 @@ namespace RuntimeUnityEditor.Core.ObjectTree
 
         private void DrawSingleComponent(Component component)
         {
-            GUILayout.BeginHorizontal(GUI.skin.box);
+            GUILayout.BeginVertical(GUI.skin.box);
+            {
+                DrawSingleComponentFirstRow(component);
+                DrawSingleComponentSecondRow(component);
+            }
+            GUILayout.EndHorizontal();
+        }
+        
+        private void DrawSingleComponentFirstRow(Component component)
+        {
+            GUILayout.BeginHorizontal();
             {
                 if (component is Behaviour bh)
                     bh.enabled = GUILayout.Toggle(bh.enabled, "", GUILayout.ExpandWidth(false));
@@ -391,9 +402,7 @@ namespace RuntimeUnityEditor.Core.ObjectTree
                         GUILayout.Label(r.mainTexture);
                         break;
                     case Renderer re:
-                        GUILayout.Label(re.material != null
-                            ? re.material.shader.name
-                            : "[No material]");
+                        GUILayout.Label(re.material != null ? re.material.shader.name : "[No material]");
                         break;
                     case Button b:
                         {
@@ -457,6 +466,15 @@ namespace RuntimeUnityEditor.Core.ObjectTree
                 }
             }
             GUILayout.EndHorizontal();
+        }
+
+        private void DrawSingleComponentSecondRow(Component component)
+        {
+            if (component is Renderer renderer && renderer.material != null)
+            {
+                if (GUILayout.Button("Open In Material Editor", GUILayout.ExpandWidth(true)))
+                    new MaterialEditorViewer(renderer.material);
+            }
         }
 
         private string _searchText = string.Empty;

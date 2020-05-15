@@ -178,6 +178,14 @@ namespace RuntimeUnityEditor.Core.MaterialEditor
                 GUILayout.BeginHorizontal();
                 {
                     GUILayout.FlexibleSpace();
+                    GUILayout.Label("For the following property to work, you may need to enable these following keywords:");
+                    GUILayout.FlexibleSpace();
+                }
+                GUILayout.EndHorizontal();;
+                
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.FlexibleSpace();
                     var keywordCollection = MaterialEditorPropertyKeywords.KEYWORDS[property];
                     GUILayout.Label(keywordCollection.Length == 0 ? "No Keywords" : string.Join(", ", keywordCollection));
                     GUILayout.FlexibleSpace();
