@@ -12,6 +12,7 @@ In-game inspector, editor and interactive console for Subnautica. It's designed 
 - Object inspector that allows modifying values of objects in real time
 - REPL C# console
 - All parts are integrated together (e.g. REPL console can access inspected object, inspector can focus objects on GameObject list, etc.)
+- Pin variables to the top left of your screen even while the editor is closed.
 
 ![preview](https://user-images.githubusercontent.com/39247311/64476158-ce1a4c00-d18b-11e9-97d6-084452cdbf0a.PNG)
 
